@@ -1,0 +1,580 @@
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Modal,
+  TextInput,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import {
+  MapPin,
+  CreditCard,
+  Calendar,
+  Clock,
+  Trash2,
+  X,
+  Check,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react-native';
+import ScreenHeader from '@/components/ScreenHeader';
+import PrimaryButton from '@/components/PrimaryButton';
+
+type CartItem = { id: string; name: string; detail: string; price: number; image: string };
+
+const INITIAL_ITEMS: CartItem[] = [
+  { id: '1', name: 'Lavado de Ropa (5kg)', detail: 'Plan 1-5 kg · $30/kg', price: 150, image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { id: '2', name: 'Limpieza de Tenis', detail: '2 pares · $80 c/u', price: 160, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { id: '3', name: 'Detergente Pulcro Pro', detail: '1 L', price: 85, image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=200' },
+];
+
+type Address = { id: string; label: string; text: string };
+const SAVED_ADDRESSES: Address[] = [
+  { id: 'a1', label: 'Casa', text: 'Av. Reforma 123, Col. Centro, CDMX' },
+  { id: 'a2', label: 'Trabajo', text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
+  { id: 'a3', label: 'Otro', text: 'Polanco 789, Col. Polanco, CDMX' },
+];
+
+type PaymentMethod = { id: string; label: string; last4: string };
+const SAVED_PAYMENTS: PaymentMethod[] = [
+  { id: 'p1', label: 'Visa', last4: '4242' },
+  { id: 'p2', label: 'Mastercard', last4: '5555' },
+  { id: 'p3', label: 'OXXO Pay', last4: '' },
+];
+
+const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+const TIME_SLOTS = [
+  '08:00 - 10:00',
+  '10:00 - 12:00',
+  '12:00 - 14:00',
+  '14:00 - 16:00',
+  '16:00 - 18:00',
+  '18:00 - 20:00',
+];
+
+const MXN = (n: number) => `$${n.toLocaleString('es-MX')} MXN`;
+
+function formatDate(d: Date) {
+  return `${DAYS[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${MONTHS[d.getMonth()]}`;
+}
+
+export default function CartScreen() {
+  const router = useRouter();
+
+  const [items, setItems] = useState<CartItem[]>(INITIAL_ITEMS);
+
+  const [selectedAddressId, setSelectedAddressId] = useState('a1');
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [newAddress, setNewAddress] = useState('');
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>(SAVED_ADDRESSES);
+
+  const [selectedPaymentId, setSelectedPaymentId] = useState('p1');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // Date/time state
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d;
+  });
+  const [selectedTime, setSelectedTime] = useState(TIME_SLOTS[1]);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [viewMonth, setViewMonth] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d;
+  });
+
+  const removeItem = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+  const clearAll = () => setItems([]);
+
+  const currentAddress = savedAddresses.find((a) => a.id === selectedAddressId)!;
+  const currentPayment = SAVED_PAYMENTS.find((p) => p.id === selectedPaymentId)!;
+
+  const addNewAddress = () => {
+    if (!newAddress.trim()) return;
+    const id = `a${Date.now()}`;
+    setSavedAddresses((prev) => [...prev, { id, label: 'Nueva', text: newAddress.trim() }]);
+    setSelectedAddressId(id);
+    setNewAddress('');
+    setShowAddressModal(false);
+  };
+
+  const subtotal = items.reduce((sum, i) => sum + i.price, 0);
+  const total = subtotal;
+
+  // Calendar helpers
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startOffset = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+    const cells: (Date | null)[] = [];
+    for (let i = 0; i < startOffset; i++) cells.push(null);
+    for (let d = 1; d <= totalDays; d++) cells.push(new Date(year, month, d));
+    return cells;
+  };
+
+  const calendarCells = getDaysInMonth(viewMonth);
+  const canGoPrev = viewMonth.getFullYear() > today.getFullYear() || (viewMonth.getFullYear() === today.getFullYear() && viewMonth.getMonth() > today.getMonth());
+
+  const isSameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  const isSelectable = (d: Date) => {
+    const copy = new Date(d);
+    copy.setHours(0, 0, 0, 0);
+    return copy >= today;
+  };
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScreenHeader
+        title="Carrito"
+        rightIcon={<Trash2 size={20} color={Colors.error} strokeWidth={2.5} />}
+        onRightPress={() => setShowConfirm(true)}
+      />
+
+      {items.length === 0 ? (
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}>
+            <Trash2 size={40} color={Colors.textMuted} strokeWidth={1.5} />
+          </View>
+          <Text style={styles.emptyTitle}>Tu carrito está vacío</Text>
+          <Text style={styles.emptySubtitle}>Agrega servicios o productos para continuar</Text>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => router.back()} style={styles.emptyBtn}>
+            <Text style={styles.emptyBtnText}>Explorar servicios</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          {items.map((item) => (
+            <View key={item.id} style={styles.cartItem}>
+              <Image source={{ uri: item.image }} style={styles.itemImage} />
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemDetail}>{item.detail}</Text>
+                <Text style={styles.itemPrice}>{MXN(item.price)}</Text>
+              </View>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => removeItem(item.id)} style={styles.removeBtn}>
+                <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          {/* Address */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Dirección de recogida</Text>
+            <View style={styles.addressRow}>
+              <View style={styles.addressIcon}>
+                <MapPin size={18} color={Colors.primary} strokeWidth={2.5} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.addressLabel}>{currentAddress.label}</Text>
+                <Text style={styles.addressText}>{currentAddress.text}</Text>
+              </View>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddressModal(true)} style={styles.changeBtn}>
+                <Text style={styles.changeText}>Cambiar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Schedule */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Fecha y horario</Text>
+            <TouchableOpacity activeOpacity={0.7} onPress={() => setShowScheduleModal(true)} style={styles.scheduleRow}>
+              <View style={styles.scheduleItem}>
+                <Calendar size={18} color={Colors.secondary} strokeWidth={2.5} />
+                <Text style={styles.scheduleText}>{formatDate(selectedDate)}</Text>
+              </View>
+              <View style={styles.scheduleItem}>
+                <Clock size={18} color={Colors.secondary} strokeWidth={2.5} />
+                <Text style={styles.scheduleText}>{selectedTime}</Text>
+              </View>
+              <Text style={styles.changeText}>Cambiar</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Payment */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>Método de pago</Text>
+            <View style={styles.paymentRow}>
+              <View style={styles.paymentIcon}>
+                <CreditCard size={18} color={Colors.white} strokeWidth={2.5} />
+              </View>
+              <Text style={styles.paymentText}>
+                {currentPayment.last4 ? `${currentPayment.label} •••• ${currentPayment.last4}` : currentPayment.label}
+              </Text>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => setShowPaymentModal(true)} style={styles.changeBtn}>
+                <Text style={styles.changeText}>Cambiar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Summary */}
+          <View style={styles.summaryCard}>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Subtotal</Text>
+              <Text style={styles.summaryValue}>{MXN(subtotal)}</Text>
+            </View>
+            <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
+              <Text style={styles.summaryLabel}>Envío</Text>
+              <Text style={styles.summaryValueFree}>Gratis</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.summaryRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>{MXN(total)}</Text>
+            </View>
+          </View>
+
+          <PrimaryButton label="Confirmar pedido" onPress={() => router.push('/(tabs)/orders')} style={{ marginTop: Spacing.lg }} />
+          <View style={{ height: Spacing.xxl }} />
+        </ScrollView>
+      )}
+
+      {/* Address Modal */}
+      <Modal visible={showAddressModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Dirección de recogida</Text>
+              <TouchableOpacity onPress={() => setShowAddressModal(false)} style={styles.modalClose}>
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={savedAddresses}
+              keyExtractor={(a) => a.id}
+              style={{ maxHeight: 220 }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => { setSelectedAddressId(item.id); setShowAddressModal(false); }}
+                  style={styles.optionRow}
+                >
+                  <View style={[styles.optionIcon, { backgroundColor: Colors.primary + '15' }]}>
+                    <MapPin size={18} color={Colors.primary} strokeWidth={2.5} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.optionLabel}>{item.label}</Text>
+                    <Text style={styles.optionText}>{item.text}</Text>
+                  </View>
+                  {selectedAddressId === item.id && (
+                    <View style={styles.checkCircle}>
+                      <Check size={14} color={Colors.white} strokeWidth={2.5} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+
+            <View style={styles.newAddressWrap}>
+              <Text style={styles.newAddressLabel}>Agregar nueva dirección</Text>
+              <TextInput
+                value={newAddress}
+                onChangeText={setNewAddress}
+                placeholder="Calle, número, colonia, ciudad..."
+                placeholderTextColor={Colors.textMuted}
+                style={styles.input}
+              />
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={addNewAddress}
+                style={[styles.addAddressBtn, !newAddress.trim() && { opacity: 0.4 }]}
+              >
+                <Plus size={16} color={Colors.white} strokeWidth={2.5} />
+                <Text style={styles.addAddressBtnText}>Agregar</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
+      {/* Schedule Modal */}
+      <Modal visible={showScheduleModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Fecha y horario</Text>
+              <TouchableOpacity onPress={() => setShowScheduleModal(false)} style={styles.modalClose}>
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Calendar */}
+            <View style={styles.calendarHeader}>
+              <TouchableOpacity disabled={!canGoPrev} onPress={() => {
+                const d = new Date(viewMonth);
+                d.setMonth(d.getMonth() - 1);
+                setViewMonth(d);
+              }} style={[styles.calNav, !canGoPrev && { opacity: 0.3 }]}>
+                <ChevronLeft size={20} color={Colors.textPrimary} strokeWidth={2.5} />
+              </TouchableOpacity>
+              <Text style={styles.calMonthLabel}>{MONTHS[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
+              <TouchableOpacity onPress={() => {
+                const d = new Date(viewMonth);
+                d.setMonth(d.getMonth() + 1);
+                setViewMonth(d);
+              }} style={styles.calNav}>
+                <ChevronRight size={20} color={Colors.textPrimary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.calWeekRow}>
+              {DAYS.map((d) => (
+                <Text key={d} style={styles.calWeekDay}>{d}</Text>
+              ))}
+            </View>
+
+            <View style={styles.calGrid}>
+              {calendarCells.map((d, i) => {
+                if (!d) return <View key={`e${i}`} style={styles.calCell} />;
+                const selectable = isSelectable(d);
+                const isSelected = isSameDay(d, selectedDate);
+                const isToday = isSameDay(d, today);
+                return (
+                  <TouchableOpacity
+                    key={i}
+                    disabled={!selectable}
+                    onPress={() => setSelectedDate(d)}
+                    style={[
+                      styles.calCell,
+                      selectable && styles.calCellSelectable,
+                      isSelected && styles.calCellSelected,
+                      !selectable && styles.calCellDisabled,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.calDayText,
+                        isToday && styles.calDayToday,
+                        isSelected && styles.calDaySelected,
+                        !selectable && styles.calDayDisabled,
+                      ]}
+                    >
+                      {d.getDate()}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Time slots */}
+            <Text style={styles.timeSlotTitle}>Horarios disponibles</Text>
+            <View style={styles.timeSlotGrid}>
+              {TIME_SLOTS.map((slot) => (
+                <TouchableOpacity
+                  key={slot}
+                  activeOpacity={0.7}
+                  onPress={() => setSelectedTime(slot)}
+                  style={[styles.timeSlot, selectedTime === slot && styles.timeSlotSelected]}
+                >
+                  <Text style={[styles.timeSlotText, selectedTime === slot && styles.timeSlotTextSelected]}>
+                    {slot}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <PrimaryButton
+              label="Confirmar"
+              onPress={() => setShowScheduleModal(false)}
+              style={{ marginTop: Spacing.lg }}
+            />
+            <View style={{ height: Spacing.lg }} />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal visible={showPaymentModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Método de pago</Text>
+              <TouchableOpacity onPress={() => setShowPaymentModal(false)} style={styles.modalClose}>
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+
+            {SAVED_PAYMENTS.map((pm) => (
+              <TouchableOpacity
+                key={pm.id}
+                activeOpacity={0.7}
+                onPress={() => { setSelectedPaymentId(pm.id); setShowPaymentModal(false); }}
+                style={styles.optionRow}
+              >
+                <View style={[styles.optionIcon, { backgroundColor: Colors.primary }]}>
+                  <CreditCard size={18} color={Colors.white} strokeWidth={2.5} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.optionLabel}>{pm.label}</Text>
+                  {pm.last4 ? (
+                    <Text style={styles.optionText}>•••• •••• •••• {pm.last4}</Text>
+                  ) : (
+                    <Text style={styles.optionText}>Pago en efectivo en tienda</Text>
+                  )}
+                </View>
+                {selectedPaymentId === pm.id && (
+                  <View style={styles.checkCircle}>
+                    <Check size={14} color={Colors.white} strokeWidth={2.5} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+
+            <View style={{ height: Spacing.lg }} />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Clear Cart Confirm Modal */}
+      <Modal visible={showConfirm} animationType="fade" transparent>
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmCard}>
+            <View style={styles.confirmIcon}>
+              <Trash2 size={28} color={Colors.error} strokeWidth={2.5} />
+            </View>
+            <Text style={styles.confirmTitle}>Vaciar carrito</Text>
+            <Text style={styles.confirmText}>¿Estás seguro que deseas eliminar todos los artículos del carrito?</Text>
+            <View style={styles.confirmButtons}>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => setShowConfirm(false)} style={styles.cancelBtn}>
+                <Text style={styles.cancelBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => { clearAll(); setShowConfirm(false); }} style={styles.deleteBtn}>
+                <Text style={styles.deleteBtnText}>Eliminar todo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: Colors.background },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+
+  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xxl },
+  emptyIcon: { width: 88, height: 88, borderRadius: Radius.xl, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.lg },
+  emptyTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.sm },
+  emptySubtitle: { fontSize: FontSize.md, color: Colors.textMuted, textAlign: 'center', marginBottom: Spacing.xl },
+  emptyBtn: { backgroundColor: Colors.primary, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md, borderRadius: Radius.lg },
+  emptyBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.white },
+
+  cartItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, ...Shadow.sm },
+  itemImage: { width: 64, height: 64, borderRadius: Radius.md, resizeMode: 'cover' },
+  itemInfo: { flex: 1 },
+  itemName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  itemDetail: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
+  itemPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary, marginTop: 4 },
+  removeBtn: { width: 36, height: 36, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
+
+  sectionCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, ...Shadow.sm },
+  sectionTitle: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
+
+  addressRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  addressIcon: { width: 40, height: 40, borderRadius: Radius.md, backgroundColor: Colors.primary + '15', justifyContent: 'center', alignItems: 'center' },
+  addressLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textPrimary },
+  addressText: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
+  changeBtn: { paddingHorizontal: Spacing.sm, paddingVertical: 6, borderRadius: Radius.full, backgroundColor: Colors.primary + '12' },
+  changeText: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.primary },
+
+  scheduleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
+  scheduleItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  scheduleText: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
+
+  paymentRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  paymentIcon: { width: 40, height: 40, borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  paymentText: { flex: 1, fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
+
+  summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
+  summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  summaryValueFree: { fontSize: FontSize.md, fontWeight: '700', color: Colors.success },
+  divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },
+  totalLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
+  totalValue: { fontSize: FontSize.xxl, fontWeight: '800', color: Colors.primary },
+
+  // Modals shared
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalSheet: { backgroundColor: Colors.white, borderTopLeftRadius: Radius.xl, borderTopRightRadius: Radius.xl, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl, maxHeight: '90%' },
+  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
+  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
+  modalClose: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+
+  optionRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  optionIcon: { width: 40, height: 40, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  optionLabel: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  optionText: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
+  checkCircle: { width: 24, height: 24, borderRadius: Radius.full, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+
+  newAddressWrap: { marginTop: Spacing.lg },
+  newAddressLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary, marginBottom: Spacing.sm },
+  input: { borderWidth: 1.5, borderColor: Colors.border, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, fontSize: FontSize.md, color: Colors.textPrimary, marginBottom: Spacing.sm, backgroundColor: Colors.white },
+  addAddressBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: Colors.primary, borderRadius: Radius.lg, paddingVertical: Spacing.md },
+  addAddressBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.white },
+
+  // Calendar
+  calendarHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
+  calNav: { width: 36, height: 36, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  calMonthLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
+  calWeekRow: { flexDirection: 'row', marginBottom: Spacing.sm },
+  calWeekDay: { flex: 1, textAlign: 'center', fontSize: FontSize.xs, fontWeight: '600', color: Colors.textMuted },
+  calGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  calCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', borderRadius: Radius.sm },
+  calCellSelectable: {},
+  calCellSelected: { backgroundColor: Colors.primary, borderRadius: Radius.full },
+  calCellDisabled: { opacity: 0.3 },
+  calDayText: { fontSize: FontSize.sm, fontWeight: '500', color: Colors.textPrimary },
+  calDayToday: { fontWeight: '700', color: Colors.secondary },
+  calDaySelected: { color: Colors.white, fontWeight: '700' },
+  calDayDisabled: { color: Colors.textMuted },
+
+  // Time slots
+  timeSlotTitle: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary, marginTop: Spacing.lg, marginBottom: Spacing.sm },
+  timeSlotGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  timeSlot: { paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: Radius.lg, backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: 'transparent' },
+  timeSlotSelected: { backgroundColor: Colors.primary + '12', borderColor: Colors.primary },
+  timeSlotText: { fontSize: FontSize.sm, fontWeight: '500', color: Colors.textSecondary },
+  timeSlotTextSelected: { color: Colors.primary, fontWeight: '700' },
+
+  // Clear cart confirm
+  confirmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing.xl },
+  confirmCard: { backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.xl, width: '100%', alignItems: 'center', ...Shadow.lg },
+  confirmIcon: { width: 64, height: 64, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.md },
+  confirmTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.sm },
+  confirmText: { fontSize: FontSize.md, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22, marginBottom: Spacing.xl },
+  confirmButtons: { flexDirection: 'row', gap: Spacing.md, width: '100%' },
+  cancelBtn: { flex: 1, paddingVertical: Spacing.md, borderRadius: Radius.lg, backgroundColor: Colors.surface, alignItems: 'center' },
+  cancelBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textSecondary },
+  deleteBtn: { flex: 1, paddingVertical: Spacing.md, borderRadius: Radius.lg, backgroundColor: Colors.error, alignItems: 'center' },
+  deleteBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.white },
+});
