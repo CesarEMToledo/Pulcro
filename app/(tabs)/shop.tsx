@@ -64,7 +64,7 @@ export default function ShopScreen() {
                     <Text style={styles.price}>{MXN(prod.price)}</Text>
                     <Text style={styles.unit}>{prod.unit === 'Pack' ? t.shop.unitPack : prod.unit}</Text>
                   </View>
-                  <TouchableOpacity activeOpacity={0.7} style={styles.addButton}>
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/cart')} style={styles.addButton}>
                     <ShoppingBag size={16} color={Colors.white} strokeWidth={2.5} />
                   </TouchableOpacity>
                 </View>

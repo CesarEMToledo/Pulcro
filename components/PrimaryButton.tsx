@@ -1,11 +1,11 @@
-import { Text, StyleSheet, TouchableOpacity, TextStyle } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Radius, Spacing, FontSize, Shadow } from '@/constants/theme';
 
 interface Props {
   label: string;
   onPress: () => void;
-  style?: TextStyle;
+  style?: ViewStyle;
   disabled?: boolean;
   icon?: React.ReactNode;
 }

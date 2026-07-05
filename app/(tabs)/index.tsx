@@ -127,7 +127,7 @@ export default function HomeScreen() {
           <SectionHeader title={t.home.popularTitle} actionText={t.home.viewAll} onAction={() => router.push('/shop')} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
             {popularServicesData.map((svc) => (
-              <TouchableOpacity key={svc.key} activeOpacity={0.85} style={styles.popularCard}>
+              <TouchableOpacity key={svc.key} activeOpacity={0.85} onPress={() => router.push('/cart')} style={styles.popularCard}>
                 <Image source={{ uri: svc.image }} style={styles.popularImage} />
                 <View style={styles.popularInfo}>
                   <Text style={styles.popularName} numberOfLines={1}>{t.home.popularServices[svc.key]}</Text>
