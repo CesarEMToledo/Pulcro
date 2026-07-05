@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Search, Bell, MapPin, Star, Clock } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useLocation } from '@/contexts/LocationContext';
 import LanguageToggle from '@/components/LanguageToggle';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -65,17 +66,18 @@ const popularServicesData = [
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { address } = useLocation();
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View>
+            <View style={styles.headerTextWrap}>
               <Text style={styles.greeting}>{t.home.greeting}</Text>
               <View style={styles.locationRow}>
                 <MapPin size={14} color={Colors.primary} strokeWidth={2.5} />
-                <Text style={styles.location}>{t.home.location}</Text>
+                <Text style={styles.location} numberOfLines={1}>{address || t.home.location}</Text>
               </View>
             </View>
             <View style={styles.headerActions}>
@@ -159,9 +161,10 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 20 },
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.md },
+  headerTextWrap: { flex: 1, marginRight: Spacing.sm },
   greeting: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.textPrimary },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  location: { fontSize: FontSize.sm, color: Colors.textSecondary },
+  location: { flex: 1, fontSize: FontSize.sm, color: Colors.textSecondary },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   bellButton: { width: 44, height: 44, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   badge: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.error },

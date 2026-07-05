@@ -234,6 +234,17 @@ const es = {
   categoryCard: {
     viewMore: 'Ver más',
   },
+  location: {
+    title: 'Confirma tu ubicación',
+    subtitle: 'La usaremos para recoger y entregar tus pedidos.',
+    detecting: 'Detectando tu ubicación...',
+    pinHint: 'Tu pedido se recogerá aquí',
+    useCurrentLocation: 'Usar mi ubicación actual',
+    confirmButton: 'Confirmar ubicación',
+    permissionDeniedTitle: 'Permiso de ubicación denegado',
+    permissionDeniedText: 'Activa el permiso de ubicación en los ajustes de tu dispositivo o mueve el mapa para elegir tu dirección manualmente.',
+    locatingError: 'No pudimos obtener tu ubicación. Mueve el mapa para elegirla manualmente.',
+  },
 };
 
 const en: typeof es = {
@@ -469,6 +480,17 @@ const en: typeof es = {
   },
   categoryCard: {
     viewMore: 'See more',
+  },
+  location: {
+    title: 'Confirm your location',
+    subtitle: "We'll use it to pick up and deliver your orders.",
+    detecting: 'Detecting your location...',
+    pinHint: 'Your order will be picked up here',
+    useCurrentLocation: 'Use my current location',
+    confirmButton: 'Confirm location',
+    permissionDeniedTitle: 'Location permission denied',
+    permissionDeniedText: 'Enable location permission in your device settings, or move the map to choose your address manually.',
+    locatingError: "We couldn't get your location. Move the map to choose it manually.",
   },
 };
 
