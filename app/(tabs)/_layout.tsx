@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { Home, ShoppingBag, ClipboardList, User } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function TabLayout() {
+  const { t } = useLanguage();
+
   return (
     <Tabs
       screenOptions={{
@@ -26,28 +29,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Inicio',
+          title: t.tabs.home,
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} strokeWidth={2.5} />,
         }}
       />
       <Tabs.Screen
         name="orders"
         options={{
-          title: 'Pedidos',
+          title: t.tabs.orders,
           tabBarIcon: ({ size, color }) => <ClipboardList size={size} color={color} strokeWidth={2.5} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
-          title: 'Tienda',
+          title: t.tabs.shop,
           tabBarIcon: ({ size, color }) => <ShoppingBag size={size} color={color} strokeWidth={2.5} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Perfil',
+          title: t.tabs.profile,
           tabBarIcon: ({ size, color }) => <User size={size} color={color} strokeWidth={2.5} />,
         }}
       />

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Radius, Spacing, FontSize, Shadow } from '@/constants/theme';
 import { ChevronRight } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Props {
   title: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function CategoryCard({ title, description, image, gradient, onPress }: Props) {
+  const { t } = useLanguage();
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={styles.container}>
       <LinearGradient colors={gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
@@ -20,7 +22,7 @@ export default function CategoryCard({ title, description, image, gradient, onPr
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.description}>{description}</Text>
             <View style={styles.cta}>
-              <Text style={styles.ctaText}>Ver más</Text>
+              <Text style={styles.ctaText}>{t.categoryCard.viewMore}</Text>
               <ChevronRight size={16} color={Colors.white} strokeWidth={2.5} />
             </View>
           </View>

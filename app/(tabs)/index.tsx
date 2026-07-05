@@ -4,59 +4,57 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Search, Bell, MapPin, Star, Clock } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageToggle from '@/components/LanguageToggle';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import CategoryCard from '@/components/CategoryCard';
 import SectionHeader from '@/components/SectionHeader';
 
-const categories = [
+const categoriesData = [
   {
-    title: 'Ropa por Kilos',
-    description: 'Lavamos tu ropa por peso. Recogemos y entregamos.',
+    key: 'laundry' as const,
     image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=400',
     gradient: ['#1A6FD4', '#4A90E2'] as [string, string],
     route: '/laundry' as const,
   },
   {
-    title: 'Limpieza de Prendas',
-    description: 'Sombreros, tenis, cinturones, zapatos, botas y gorras.',
+    key: 'garments' as const,
     image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
     gradient: ['#2ABFBF', '#00D4AA'] as [string, string],
     route: '/garments' as const,
   },
   {
-    title: 'Limpieza de Casas',
-    description: 'Profesionales a tu hogar. Limpieza profunda y regular.',
+    key: 'house' as const,
     image: 'https://images.pexels.com/photos/4239031/pexels-photo-4239031.jpeg?auto=compress&cs=tinysrgb&w=400',
     gradient: ['#1A6FD4', '#2ABFBF'] as [string, string],
     route: '/house' as const,
   },
   {
-    title: 'Limpieza de Carros',
-    description: 'Detallado interior y exterior a domicilio.',
+    key: 'car' as const,
     image: 'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg?auto=compress&cs=tinysrgb&w=400',
     gradient: ['#0D4FA0', '#1A6FD4'] as [string, string],
     route: '/car' as const,
   },
 ];
 
-const popularServices = [
+const popularServicesData = [
   {
-    name: 'Lavado de Tenis',
+    key: 'sneakers' as const,
     price: 80,
     image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=300',
     rating: 4.9,
     time: '24 hrs',
   },
   {
-    name: 'Limpieza de Casa',
+    key: 'house' as const,
     price: 500,
     image: 'https://images.pexels.com/photos/4239031/pexels-photo-4239031.jpeg?auto=compress&cs=tinysrgb&w=300',
     rating: 4.8,
     time: '3 hrs',
   },
   {
-    name: 'Lavado de Ropa (5kg)',
+    key: 'laundry5kg' as const,
     price: 150,
     image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=300',
     rating: 5.0,
@@ -66,6 +64,7 @@ const popularServices = [
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -73,21 +72,24 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View>
-              <Text style={styles.greeting}>Hola, bienvenido</Text>
+              <Text style={styles.greeting}>{t.home.greeting}</Text>
               <View style={styles.locationRow}>
                 <MapPin size={14} color={Colors.primary} strokeWidth={2.5} />
-                <Text style={styles.location}>Av. Reforma 123, CDMX</Text>
+                <Text style={styles.location}>{t.home.location}</Text>
               </View>
             </View>
-            <TouchableOpacity activeOpacity={0.7} style={styles.bellButton}>
-              <Bell size={20} color={Colors.primary} strokeWidth={2.5} />
-              <View style={styles.badge} />
-            </TouchableOpacity>
+            <View style={styles.headerActions}>
+              <LanguageToggle />
+              <TouchableOpacity activeOpacity={0.7} style={styles.bellButton}>
+                <Bell size={20} color={Colors.primary} strokeWidth={2.5} />
+                <View style={styles.badge} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.searchBar}>
             <Search size={18} color={Colors.textMuted} strokeWidth={2.5} />
-            <Text style={styles.searchPlaceholder}>¿Qué servicio necesitas hoy?</Text>
+            <Text style={styles.searchPlaceholder}>{t.home.searchPlaceholder}</Text>
           </View>
         </View>
 
@@ -95,9 +97,9 @@ export default function HomeScreen() {
           <LinearGradient colors={['#1A6FD4', '#2ABFBF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroGradient}>
             <View style={styles.heroContent}>
               <Text style={styles.heroTitle}>PULCRO</Text>
-              <Text style={styles.heroSubtitle}>Limpieza a domicilio, simple y rápido</Text>
+              <Text style={styles.heroSubtitle}>{t.home.heroSubtitle}</Text>
               <View style={styles.heroBadge}>
-                <Text style={styles.heroBadgeText}>Recogemos y entregamos</Text>
+                <Text style={styles.heroBadgeText}>{t.home.heroBadge}</Text>
               </View>
             </View>
             <Image
@@ -108,12 +110,12 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.section}>
-          <SectionHeader title="Servicios" subtitle="Elige la categoría que necesitas" />
-          {categories.map((cat) => (
+          <SectionHeader title={t.home.servicesTitle} subtitle={t.home.servicesSubtitle} />
+          {categoriesData.map((cat) => (
             <CategoryCard
-              key={cat.title}
-              title={cat.title}
-              description={cat.description}
+              key={cat.key}
+              title={t.home.categories[cat.key].title}
+              description={t.home.categories[cat.key].description}
               image={cat.image}
               gradient={cat.gradient}
               onPress={() => router.push(cat.route)}
@@ -122,13 +124,13 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.section}>
-          <SectionHeader title="Populares" actionText="Ver todo" onAction={() => router.push('/shop')} />
+          <SectionHeader title={t.home.popularTitle} actionText={t.home.viewAll} onAction={() => router.push('/shop')} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
-            {popularServices.map((svc) => (
-              <TouchableOpacity key={svc.name} activeOpacity={0.85} style={styles.popularCard}>
+            {popularServicesData.map((svc) => (
+              <TouchableOpacity key={svc.key} activeOpacity={0.85} style={styles.popularCard}>
                 <Image source={{ uri: svc.image }} style={styles.popularImage} />
                 <View style={styles.popularInfo}>
-                  <Text style={styles.popularName} numberOfLines={1}>{svc.name}</Text>
+                  <Text style={styles.popularName} numberOfLines={1}>{t.home.popularServices[svc.key]}</Text>
                   <View style={styles.popularMeta}>
                     <View style={styles.ratingRow}>
                       <Star size={12} color={Colors.warning} strokeWidth={2.5} fill={Colors.warning} />
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
   greeting: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.textPrimary },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   location: { fontSize: FontSize.sm, color: Colors.textSecondary },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   bellButton: { width: 44, height: 44, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   badge: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.error },
   searchBar: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.surface, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md + 2, marginBottom: Spacing.lg },

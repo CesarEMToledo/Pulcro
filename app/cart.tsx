@@ -29,21 +29,11 @@ import {
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type CartItem = { id: string; name: string; detail: string; price: number; image: string };
 
-const INITIAL_ITEMS: CartItem[] = [
-  { id: '1', name: 'Lavado de Ropa (5kg)', detail: 'Plan 1-5 kg · $30/kg', price: 150, image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=200' },
-  { id: '2', name: 'Limpieza de Tenis', detail: '2 pares · $80 c/u', price: 160, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=200' },
-  { id: '3', name: 'Detergente Pulcro Pro', detail: '1 L', price: 85, image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=200' },
-];
-
 type Address = { id: string; label: string; text: string };
-const SAVED_ADDRESSES: Address[] = [
-  { id: 'a1', label: 'Casa', text: 'Av. Reforma 123, Col. Centro, CDMX' },
-  { id: 'a2', label: 'Trabajo', text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
-  { id: 'a3', label: 'Otro', text: 'Polanco 789, Col. Polanco, CDMX' },
-];
 
 type PaymentMethod = { id: string; label: string; last4: string };
 const SAVED_PAYMENTS: PaymentMethod[] = [
@@ -51,9 +41,6 @@ const SAVED_PAYMENTS: PaymentMethod[] = [
   { id: 'p2', label: 'Mastercard', last4: '5555' },
   { id: 'p3', label: 'OXXO Pay', last4: '' },
 ];
-
-const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 const TIME_SLOTS = [
   '08:00 - 10:00',
@@ -66,12 +53,25 @@ const TIME_SLOTS = [
 
 const MXN = (n: number) => `$${n.toLocaleString('es-MX')} MXN`;
 
-function formatDate(d: Date) {
-  return `${DAYS[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${MONTHS[d.getMonth()]}`;
-}
-
 export default function CartScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
+
+  const INITIAL_ITEMS: CartItem[] = [
+    { id: '1', name: t.cart.items.laundry5kg.name, detail: t.cart.items.laundry5kg.detail, price: 150, image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=200' },
+    { id: '2', name: t.cart.items.sneakers.name, detail: t.cart.items.sneakers.detail, price: 160, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=200' },
+    { id: '3', name: t.cart.items.detergentPro.name, detail: t.cart.items.detergentPro.detail, price: 85, image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  ];
+
+  const SAVED_ADDRESSES: Address[] = [
+    { id: 'a1', label: t.cart.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
+    { id: 'a2', label: t.cart.addressLabels.work, text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
+    { id: 'a3', label: t.cart.addressLabels.other, text: 'Polanco 789, Col. Polanco, CDMX' },
+  ];
+
+  function formatDate(d: Date) {
+    return `${t.cart.days[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${t.cart.months[d.getMonth()]}`;
+  }
 
   const [items, setItems] = useState<CartItem[]>(INITIAL_ITEMS);
 
@@ -108,7 +108,7 @@ export default function CartScreen() {
   const addNewAddress = () => {
     if (!newAddress.trim()) return;
     const id = `a${Date.now()}`;
-    setSavedAddresses((prev) => [...prev, { id, label: 'Nueva', text: newAddress.trim() }]);
+    setSavedAddresses((prev) => [...prev, { id, label: t.cart.addressLabels.new, text: newAddress.trim() }]);
     setSelectedAddressId(id);
     setNewAddress('');
     setShowAddressModal(false);
@@ -149,7 +149,7 @@ export default function CartScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader
-        title="Carrito"
+        title={t.cart.title}
         rightIcon={<Trash2 size={20} color={Colors.error} strokeWidth={2.5} />}
         onRightPress={() => setShowConfirm(true)}
       />
@@ -159,10 +159,10 @@ export default function CartScreen() {
           <View style={styles.emptyIcon}>
             <Trash2 size={40} color={Colors.textMuted} strokeWidth={1.5} />
           </View>
-          <Text style={styles.emptyTitle}>Tu carrito está vacío</Text>
-          <Text style={styles.emptySubtitle}>Agrega servicios o productos para continuar</Text>
+          <Text style={styles.emptyTitle}>{t.cart.empty.title}</Text>
+          <Text style={styles.emptySubtitle}>{t.cart.empty.subtitle}</Text>
           <TouchableOpacity activeOpacity={0.7} onPress={() => router.back()} style={styles.emptyBtn}>
-            <Text style={styles.emptyBtnText}>Explorar servicios</Text>
+            <Text style={styles.emptyBtnText}>{t.cart.empty.button}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -183,7 +183,7 @@ export default function CartScreen() {
 
           {/* Address */}
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Dirección de recogida</Text>
+            <Text style={styles.sectionTitle}>{t.cart.pickupAddress}</Text>
             <View style={styles.addressRow}>
               <View style={styles.addressIcon}>
                 <MapPin size={18} color={Colors.primary} strokeWidth={2.5} />
@@ -193,14 +193,14 @@ export default function CartScreen() {
                 <Text style={styles.addressText}>{currentAddress.text}</Text>
               </View>
               <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddressModal(true)} style={styles.changeBtn}>
-                <Text style={styles.changeText}>Cambiar</Text>
+                <Text style={styles.changeText}>{t.common.change}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Schedule */}
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Fecha y horario</Text>
+            <Text style={styles.sectionTitle}>{t.cart.dateTime}</Text>
             <TouchableOpacity activeOpacity={0.7} onPress={() => setShowScheduleModal(true)} style={styles.scheduleRow}>
               <View style={styles.scheduleItem}>
                 <Calendar size={18} color={Colors.secondary} strokeWidth={2.5} />
@@ -210,13 +210,13 @@ export default function CartScreen() {
                 <Clock size={18} color={Colors.secondary} strokeWidth={2.5} />
                 <Text style={styles.scheduleText}>{selectedTime}</Text>
               </View>
-              <Text style={styles.changeText}>Cambiar</Text>
+              <Text style={styles.changeText}>{t.common.change}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Payment */}
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Método de pago</Text>
+            <Text style={styles.sectionTitle}>{t.cart.paymentMethod}</Text>
             <View style={styles.paymentRow}>
               <View style={styles.paymentIcon}>
                 <CreditCard size={18} color={Colors.white} strokeWidth={2.5} />
@@ -225,7 +225,7 @@ export default function CartScreen() {
                 {currentPayment.last4 ? `${currentPayment.label} •••• ${currentPayment.last4}` : currentPayment.label}
               </Text>
               <TouchableOpacity activeOpacity={0.7} onPress={() => setShowPaymentModal(true)} style={styles.changeBtn}>
-                <Text style={styles.changeText}>Cambiar</Text>
+                <Text style={styles.changeText}>{t.common.change}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -237,17 +237,17 @@ export default function CartScreen() {
               <Text style={styles.summaryValue}>{MXN(subtotal)}</Text>
             </View>
             <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
-              <Text style={styles.summaryLabel}>Envío</Text>
-              <Text style={styles.summaryValueFree}>Gratis</Text>
+              <Text style={styles.summaryLabel}>{t.common.shipping}</Text>
+              <Text style={styles.summaryValueFree}>{t.common.free}</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.summaryRow}>
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>{t.common.total}</Text>
               <Text style={styles.totalValue}>{MXN(total)}</Text>
             </View>
           </View>
 
-          <PrimaryButton label="Confirmar pedido" onPress={() => router.push('/(tabs)/orders')} style={{ marginTop: Spacing.lg }} />
+          <PrimaryButton label={t.cart.confirmOrder} onPress={() => router.push('/(tabs)/orders')} style={{ marginTop: Spacing.lg }} />
           <View style={{ height: Spacing.xxl }} />
         </ScrollView>
       )}
@@ -258,7 +258,7 @@ export default function CartScreen() {
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Dirección de recogida</Text>
+              <Text style={styles.modalTitle}>{t.cart.pickupAddress}</Text>
               <TouchableOpacity onPress={() => setShowAddressModal(false)} style={styles.modalClose}>
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
@@ -291,11 +291,11 @@ export default function CartScreen() {
             />
 
             <View style={styles.newAddressWrap}>
-              <Text style={styles.newAddressLabel}>Agregar nueva dirección</Text>
+              <Text style={styles.newAddressLabel}>{t.cart.addNewAddress}</Text>
               <TextInput
                 value={newAddress}
                 onChangeText={setNewAddress}
-                placeholder="Calle, número, colonia, ciudad..."
+                placeholder={t.cart.addressPlaceholder}
                 placeholderTextColor={Colors.textMuted}
                 style={styles.input}
               />
@@ -305,7 +305,7 @@ export default function CartScreen() {
                 style={[styles.addAddressBtn, !newAddress.trim() && { opacity: 0.4 }]}
               >
                 <Plus size={16} color={Colors.white} strokeWidth={2.5} />
-                <Text style={styles.addAddressBtnText}>Agregar</Text>
+                <Text style={styles.addAddressBtnText}>{t.common.add}</Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
@@ -318,7 +318,7 @@ export default function CartScreen() {
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Fecha y horario</Text>
+              <Text style={styles.modalTitle}>{t.cart.dateTime}</Text>
               <TouchableOpacity onPress={() => setShowScheduleModal(false)} style={styles.modalClose}>
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
@@ -333,7 +333,7 @@ export default function CartScreen() {
               }} style={[styles.calNav, !canGoPrev && { opacity: 0.3 }]}>
                 <ChevronLeft size={20} color={Colors.textPrimary} strokeWidth={2.5} />
               </TouchableOpacity>
-              <Text style={styles.calMonthLabel}>{MONTHS[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
+              <Text style={styles.calMonthLabel}>{t.cart.months[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
               <TouchableOpacity onPress={() => {
                 const d = new Date(viewMonth);
                 d.setMonth(d.getMonth() + 1);
@@ -344,7 +344,7 @@ export default function CartScreen() {
             </View>
 
             <View style={styles.calWeekRow}>
-              {DAYS.map((d) => (
+              {t.cart.days.map((d) => (
                 <Text key={d} style={styles.calWeekDay}>{d}</Text>
               ))}
             </View>
@@ -383,7 +383,7 @@ export default function CartScreen() {
             </View>
 
             {/* Time slots */}
-            <Text style={styles.timeSlotTitle}>Horarios disponibles</Text>
+            <Text style={styles.timeSlotTitle}>{t.cart.availableTimes}</Text>
             <View style={styles.timeSlotGrid}>
               {TIME_SLOTS.map((slot) => (
                 <TouchableOpacity
@@ -400,7 +400,7 @@ export default function CartScreen() {
             </View>
 
             <PrimaryButton
-              label="Confirmar"
+              label={t.common.confirm}
               onPress={() => setShowScheduleModal(false)}
               style={{ marginTop: Spacing.lg }}
             />
@@ -415,7 +415,7 @@ export default function CartScreen() {
           <View style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Método de pago</Text>
+              <Text style={styles.modalTitle}>{t.cart.paymentMethod}</Text>
               <TouchableOpacity onPress={() => setShowPaymentModal(false)} style={styles.modalClose}>
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
@@ -436,7 +436,7 @@ export default function CartScreen() {
                   {pm.last4 ? (
                     <Text style={styles.optionText}>•••• •••• •••• {pm.last4}</Text>
                   ) : (
-                    <Text style={styles.optionText}>Pago en efectivo en tienda</Text>
+                    <Text style={styles.optionText}>{t.cart.paymentCashInStore}</Text>
                   )}
                 </View>
                 {selectedPaymentId === pm.id && (
@@ -459,14 +459,14 @@ export default function CartScreen() {
             <View style={styles.confirmIcon}>
               <Trash2 size={28} color={Colors.error} strokeWidth={2.5} />
             </View>
-            <Text style={styles.confirmTitle}>Vaciar carrito</Text>
-            <Text style={styles.confirmText}>¿Estás seguro que deseas eliminar todos los artículos del carrito?</Text>
+            <Text style={styles.confirmTitle}>{t.cart.confirmCartTitle}</Text>
+            <Text style={styles.confirmText}>{t.cart.confirmCartText}</Text>
             <View style={styles.confirmButtons}>
               <TouchableOpacity activeOpacity={0.7} onPress={() => setShowConfirm(false)} style={styles.cancelBtn}>
-                <Text style={styles.cancelBtnText}>Cancelar</Text>
+                <Text style={styles.cancelBtnText}>{t.common.cancel}</Text>
               </TouchableOpacity>
               <TouchableOpacity activeOpacity={0.7} onPress={() => { clearAll(); setShowConfirm(false); }} style={styles.deleteBtn}>
-                <Text style={styles.deleteBtnText}>Eliminar todo</Text>
+                <Text style={styles.deleteBtnText}>{t.cart.deleteAll}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -28,23 +28,26 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
+import LanguageToggle from '@/components/LanguageToggle';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type Address = { id: string; label: string; text: string };
 type PaymentMethod = { id: string; label: string; last4: string };
 
-const INITIAL_ADDRESSES: Address[] = [
-  { id: 'a1', label: 'Casa', text: 'Av. Reforma 123, Col. Centro, CDMX' },
-  { id: 'a2', label: 'Trabajo', text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
-];
-
-const INITIAL_PAYMENTS: PaymentMethod[] = [
-  { id: 'p1', label: 'Visa', last4: '4242' },
-  { id: 'p2', label: 'Mastercard', last4: '5555' },
-];
-
 export default function ProfileScreen() {
+  const { t } = useLanguage();
   const [showAddresses, setShowAddresses] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
+
+  const INITIAL_ADDRESSES: Address[] = [
+    { id: 'a1', label: t.profile.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
+    { id: 'a2', label: t.profile.addressLabels.work, text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
+  ];
+
+  const INITIAL_PAYMENTS: PaymentMethod[] = [
+    { id: 'p1', label: 'Visa', last4: '4242' },
+    { id: 'p2', label: 'Mastercard', last4: '5555' },
+  ];
 
   const [addresses, setAddresses] = useState<Address[]>(INITIAL_ADDRESSES);
   const [newAddrLabel, setNewAddrLabel] = useState('');
@@ -57,7 +60,7 @@ export default function ProfileScreen() {
   const addAddress = () => {
     if (!newAddrText.trim()) return;
     const id = `a${Date.now()}`;
-    setAddresses((prev) => [...prev, { id, label: newAddrLabel.trim() || 'Nueva', text: newAddrText.trim() }]);
+    setAddresses((prev) => [...prev, { id, label: newAddrLabel.trim() || t.profile.addressLabels.new, text: newAddrText.trim() }]);
     setNewAddrLabel('');
     setNewAddrText('');
   };
@@ -75,17 +78,17 @@ export default function ProfileScreen() {
   const removePayment = (id: string) => setPayments((prev) => prev.filter((p) => p.id !== id));
 
   const menuItems = [
-    { icon: MapPin, label: 'Mis direcciones', color: Colors.primary, action: () => setShowAddresses(true) },
-    { icon: CreditCard, label: 'Métodos de pago', color: Colors.secondary, action: () => setShowPayments(true) },
-    { icon: Bell, label: 'Notificaciones', color: Colors.warning, action: () => {} },
-    { icon: Heart, label: 'Favoritos', color: Colors.error, action: () => {} },
-    { icon: Shield, label: 'Privacidad y seguridad', color: Colors.primary, action: () => {} },
-    { icon: HelpCircle, label: 'Ayuda y soporte', color: Colors.secondary, action: () => {} },
+    { icon: MapPin, label: t.profile.menu.addresses, color: Colors.primary, action: () => setShowAddresses(true) },
+    { icon: CreditCard, label: t.profile.menu.payments, color: Colors.secondary, action: () => setShowPayments(true) },
+    { icon: Bell, label: t.profile.menu.notifications, color: Colors.warning, action: () => {} },
+    { icon: Heart, label: t.profile.menu.favorites, color: Colors.error, action: () => {} },
+    { icon: Shield, label: t.profile.menu.privacy, color: Colors.primary, action: () => {} },
+    { icon: HelpCircle, label: t.profile.menu.help, color: Colors.secondary, action: () => {} },
   ];
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Mi Perfil" showBack={false} />
+      <ScreenHeader title={t.profile.title} showBack={false} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileCard}>
           <View style={styles.avatarWrap}>
@@ -94,7 +97,7 @@ export default function ProfileScreen() {
               style={styles.avatar}
             />
             <View style={styles.editBadge}>
-              <Text style={styles.editText}>Editar</Text>
+              <Text style={styles.editText}>{t.profile.edit}</Text>
             </View>
           </View>
           <Text style={styles.name}>Carlos Mendoza</Text>
@@ -104,22 +107,23 @@ export default function ProfileScreen() {
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>12</Text>
-              <Text style={styles.statLabel}>Pedidos</Text>
+              <Text style={styles.statLabel}>{t.profile.stats.orders}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>4.9</Text>
-              <Text style={styles.statLabel}>Calificación</Text>
+              <Text style={styles.statLabel}>{t.profile.stats.rating}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>500</Text>
-              <Text style={styles.statLabel}>Puntos</Text>
+              <Text style={styles.statLabel}>{t.profile.stats.points}</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.menuSection}>
+          <LanguageToggle variant="row" />
           {menuItems.map((item, i) => {
             const Icon = item.icon;
             return (
@@ -141,10 +145,10 @@ export default function ProfileScreen() {
 
         <TouchableOpacity activeOpacity={0.7} onPress={() => {}} style={styles.logoutButton}>
           <LogOut size={20} color={Colors.error} strokeWidth={2.5} />
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
+          <Text style={styles.logoutText}>{t.profile.logout}</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>PULCRO v1.0.0</Text>
+        <Text style={styles.version}>{t.profile.version}</Text>
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
 
@@ -154,7 +158,7 @@ export default function ProfileScreen() {
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Mis direcciones</Text>
+              <Text style={styles.modalTitle}>{t.profile.addressesModal.title}</Text>
               <TouchableOpacity onPress={() => setShowAddresses(false)} style={styles.modalClose}>
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
@@ -176,23 +180,23 @@ export default function ProfileScreen() {
                 </View>
               ))}
               {addresses.length === 0 && (
-                <Text style={styles.emptyModalText}>No tienes direcciones guardadas</Text>
+                <Text style={styles.emptyModalText}>{t.profile.addressesModal.empty}</Text>
               )}
             </ScrollView>
 
             <View style={styles.newItemWrap}>
-              <Text style={styles.newItemLabel}>Agregar nueva dirección</Text>
+              <Text style={styles.newItemLabel}>{t.profile.addressesModal.addNew}</Text>
               <TextInput
                 value={newAddrLabel}
                 onChangeText={setNewAddrLabel}
-                placeholder="Etiqueta (ej. Casa, Trabajo)"
+                placeholder={t.profile.addressesModal.labelPlaceholder}
                 placeholderTextColor={Colors.textMuted}
                 style={styles.input}
               />
               <TextInput
                 value={newAddrText}
                 onChangeText={setNewAddrText}
-                placeholder="Calle, número, colonia, ciudad..."
+                placeholder={t.profile.addressesModal.textPlaceholder}
                 placeholderTextColor={Colors.textMuted}
                 style={styles.input}
               />
@@ -202,7 +206,7 @@ export default function ProfileScreen() {
                 style={[styles.addBtn, !newAddrText.trim() && { opacity: 0.4 }]}
               >
                 <Plus size={16} color={Colors.white} strokeWidth={2.5} />
-                <Text style={styles.addBtnText}>Agregar dirección</Text>
+                <Text style={styles.addBtnText}>{t.profile.addressesModal.addButton}</Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
@@ -215,7 +219,7 @@ export default function ProfileScreen() {
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Métodos de pago</Text>
+              <Text style={styles.modalTitle}>{t.profile.paymentsModal.title}</Text>
               <TouchableOpacity onPress={() => setShowPayments(false)} style={styles.modalClose}>
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
@@ -232,7 +236,7 @@ export default function ProfileScreen() {
                     {pm.last4 ? (
                       <Text style={styles.optionText}>•••• •••• •••• {pm.last4}</Text>
                     ) : (
-                      <Text style={styles.optionText}>Pago en efectivo en tienda</Text>
+                      <Text style={styles.optionText}>{t.profile.paymentsModal.cashInStore}</Text>
                     )}
                   </View>
                   <TouchableOpacity onPress={() => removePayment(pm.id)} style={styles.trashBtn}>
@@ -241,23 +245,23 @@ export default function ProfileScreen() {
                 </View>
               ))}
               {payments.length === 0 && (
-                <Text style={styles.emptyModalText}>No tienes métodos de pago guardados</Text>
+                <Text style={styles.emptyModalText}>{t.profile.paymentsModal.empty}</Text>
               )}
             </ScrollView>
 
             <View style={styles.newItemWrap}>
-              <Text style={styles.newItemLabel}>Agregar nueva tarjeta</Text>
+              <Text style={styles.newItemLabel}>{t.profile.paymentsModal.addNew}</Text>
               <TextInput
                 value={newPayLabel}
                 onChangeText={setNewPayLabel}
-                placeholder="Tipo (ej. Visa, Mastercard)"
+                placeholder={t.profile.paymentsModal.typePlaceholder}
                 placeholderTextColor={Colors.textMuted}
                 style={styles.input}
               />
               <TextInput
                 value={newPayLast4}
                 onChangeText={setNewPayLast4}
-                placeholder="Últimos 4 dígitos"
+                placeholder={t.profile.paymentsModal.last4Placeholder}
                 placeholderTextColor={Colors.textMuted}
                 keyboardType="numeric"
                 maxLength={4}
@@ -269,7 +273,7 @@ export default function ProfileScreen() {
                 style={[styles.addBtn, !newPayLabel.trim() && { opacity: 0.4 }]}
               >
                 <Plus size={16} color={Colors.white} strokeWidth={2.5} />
-                <Text style={styles.addBtnText}>Agregar tarjeta</Text>
+                <Text style={styles.addBtnText}>{t.profile.paymentsModal.addButton}</Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>

@@ -8,55 +8,57 @@ import { Plus, Minus, ShoppingBag } from 'lucide-react-native';
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const garmentTypes = [
-  { name: 'Tenis', price: 80, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=300' },
-  { name: 'Zapatos', price: 60, image: 'https://images.pexels.com/photos/1456704/pexels-photo-1456704.jpeg?auto=compress&cs=tinysrgb&w=300' },
-  { name: 'Botas', price: 90, image: 'https://images.pexels.com/photos/1598967/pexels-photo-1598967.jpeg?auto=compress&cs=tinysrgb&w=300' },
-  { name: 'Gorras', price: 50, image: 'https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=300' },
-  { name: 'Sombreros', price: 70, image: 'https://images.pexels.com/photos/459976/pexels-photo-459976.jpeg?auto=compress&cs=tinysrgb&w=300' },
-  { name: 'Cinturones', price: 35, image: 'https://images.pexels.com/photos/45055/pexels-photo-45055.jpeg?auto=compress&cs=tinysrgb&w=300' },
+const garmentTypesData = [
+  { key: 'sneakers' as const, price: 80, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=300' },
+  { key: 'shoes' as const, price: 60, image: 'https://images.pexels.com/photos/1456704/pexels-photo-1456704.jpeg?auto=compress&cs=tinysrgb&w=300' },
+  { key: 'boots' as const, price: 90, image: 'https://images.pexels.com/photos/1598967/pexels-photo-1598967.jpeg?auto=compress&cs=tinysrgb&w=300' },
+  { key: 'caps' as const, price: 50, image: 'https://images.pexels.com/photos/1124465/pexels-photo-1124465.jpeg?auto=compress&cs=tinysrgb&w=300' },
+  { key: 'hats' as const, price: 70, image: 'https://images.pexels.com/photos/459976/pexels-photo-459976.jpeg?auto=compress&cs=tinysrgb&w=300' },
+  { key: 'belts' as const, price: 35, image: 'https://images.pexels.com/photos/45055/pexels-photo-45055.jpeg?auto=compress&cs=tinysrgb&w=300' },
 ];
 
 export default function GarmentsScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
-  const getQty = (name: string) => quantities[name] || 0;
-  const updateQty = (name: string, delta: number) => {
-    setQuantities((prev) => ({ ...prev, [name]: Math.max(0, (prev[name] || 0) + delta) }));
+  const getQty = (key: string) => quantities[key] || 0;
+  const updateQty = (key: string, delta: number) => {
+    setQuantities((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }));
   };
 
   const totalItems = Object.values(quantities).reduce((a, b) => a + b, 0);
-  const totalPrice = Object.entries(quantities).reduce((sum, [name, qty]) => {
-    const item = garmentTypes.find((g) => g.name === name);
+  const totalPrice = Object.entries(quantities).reduce((sum, [key, qty]) => {
+    const item = garmentTypesData.find((g) => g.key === key);
     return sum + (item ? item.price * qty : 0);
   }, 0);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Limpieza de Prendas" />
+      <ScreenHeader title={t.garments.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.introText}>Selecciona las prendas que deseas limpiar. Recogemos y entregamos en tu hogar.</Text>
+        <Text style={styles.introText}>{t.garments.intro}</Text>
 
         <View style={styles.grid}>
-          {garmentTypes.map((item) => (
-            <View key={item.name} style={styles.card}>
+          {garmentTypesData.map((item) => (
+            <View key={item.key} style={styles.card}>
               <Image source={{ uri: item.image }} style={styles.cardImage} />
-              <Text style={styles.cardName}>{item.name}</Text>
+              <Text style={styles.cardName}>{t.garments.items[item.key]}</Text>
               <Text style={styles.cardPrice}>{MXN(item.price)}</Text>
-              {getQty(item.name) === 0 ? (
-                <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.name, 1)} style={styles.addBtn}>
+              {getQty(item.key) === 0 ? (
+                <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.key, 1)} style={styles.addBtn}>
                   <Plus size={18} color={Colors.white} strokeWidth={2.5} />
-                  <Text style={styles.addBtnText}>Agregar</Text>
+                  <Text style={styles.addBtnText}>{t.common.add}</Text>
                 </TouchableOpacity>
               ) : (
                 <View style={styles.stepper}>
-                  <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.name, -1)} style={styles.stepBtn}>
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.key, -1)} style={styles.stepBtn}>
                     <Minus size={16} color={Colors.primary} strokeWidth={2.5} />
                   </TouchableOpacity>
-                  <Text style={styles.stepValue}>{getQty(item.name)}</Text>
-                  <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.name, 1)} style={styles.stepBtn}>
+                  <Text style={styles.stepValue}>{getQty(item.key)}</Text>
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => updateQty(item.key, 1)} style={styles.stepBtn}>
                     <Plus size={16} color={Colors.primary} strokeWidth={2.5} />
                   </TouchableOpacity>
                 </View>
@@ -70,10 +72,10 @@ export default function GarmentsScreen() {
       {totalItems > 0 && (
         <View style={styles.bottomBar}>
           <View>
-            <Text style={styles.bottomItems}>{totalItems} {totalItems === 1 ? 'prenda' : 'prendas'}</Text>
+            <Text style={styles.bottomItems}>{totalItems} {totalItems === 1 ? t.garments.item : t.garments.itemsPlural}</Text>
             <Text style={styles.bottomTotal}>{MXN(totalPrice)}</Text>
           </View>
-          <PrimaryButton label="Continuar" onPress={() => router.push('/cart')} />
+          <PrimaryButton label={t.garments.continueButton} onPress={() => router.push('/cart')} />
         </View>
       )}
     </SafeAreaView>

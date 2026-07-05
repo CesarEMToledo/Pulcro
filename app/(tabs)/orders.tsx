@@ -3,15 +3,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 
-const orders = [
+const ordersData = [
   {
     id: 'PUL-2024-001',
-    service: 'Lavado de Ropa por Kilos',
-    status: 'En proceso',
+    serviceKey: 'laundryByKilos' as const,
+    statusKey: 'inProgress' as const,
     statusColor: Colors.warning,
     date: '01 Jul 2026',
     total: 180,
@@ -20,8 +21,8 @@ const orders = [
   },
   {
     id: 'PUL-2024-002',
-    service: 'Limpieza de Tenis',
-    status: 'Entregado',
+    serviceKey: 'sneakersCleaning' as const,
+    statusKey: 'delivered' as const,
     statusColor: Colors.success,
     date: '28 Jun 2026',
     total: 160,
@@ -30,8 +31,8 @@ const orders = [
   },
   {
     id: 'PUL-2024-003',
-    service: 'Limpieza de Casa',
-    status: 'Recogido',
+    serviceKey: 'houseCleaning' as const,
+    statusKey: 'pickedUp' as const,
     statusColor: Colors.primary,
     date: '25 Jun 2026',
     total: 500,
@@ -40,19 +41,20 @@ const orders = [
   },
 ];
 
-const statusSteps = [
-  { label: 'Recogido', icon: Package },
-  { label: 'En proceso', icon: Clock },
-  { label: 'En camino', icon: Truck },
-  { label: 'Entregado', icon: CheckCircle },
-];
-
 export default function OrdersScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
+
+  const statusSteps = [
+    { labelKey: 'pickedUp' as const, icon: Package },
+    { labelKey: 'inProgress' as const, icon: Clock },
+    { labelKey: 'onTheWay' as const, icon: Truck },
+    { labelKey: 'delivered' as const, icon: CheckCircle },
+  ];
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Mis Pedidos" showBack={false} />
+      <ScreenHeader title={t.orders.title} showBack={false} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.activeCard}>
           <View style={styles.activeHeader}>
@@ -60,11 +62,11 @@ export default function OrdersScreen() {
               <Truck size={24} color={Colors.white} strokeWidth={2.5} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.activeTitle}>Pedido en curso</Text>
+              <Text style={styles.activeTitle}>{t.orders.activeTitle}</Text>
               <Text style={styles.activeId}>PUL-2024-001</Text>
             </View>
             <View style={[styles.statusPill, { backgroundColor: Colors.warning + '20' }]}>
-              <Text style={[styles.statusText, { color: Colors.warning }]}>En proceso</Text>
+              <Text style={[styles.statusText, { color: Colors.warning }]}>{t.orders.status.inProgress}</Text>
             </View>
           </View>
 
@@ -73,11 +75,11 @@ export default function OrdersScreen() {
               const Icon = step.icon;
               const active = i <= 1;
               return (
-                <View key={step.label} style={styles.stepWrap}>
+                <View key={step.labelKey} style={styles.stepWrap}>
                   <View style={[styles.stepCircle, active ? styles.stepActive : styles.stepInactive]}>
                     <Icon size={16} color={active ? Colors.white : Colors.textMuted} strokeWidth={2.5} />
                   </View>
-                  <Text style={[styles.stepLabel, { color: active ? Colors.primary : Colors.textMuted }]}>{step.label}</Text>
+                  <Text style={[styles.stepLabel, { color: active ? Colors.primary : Colors.textMuted }]}>{t.orders.status[step.labelKey]}</Text>
                   {i < statusSteps.length - 1 && <View style={[styles.stepLine, { backgroundColor: i < 1 ? Colors.primary : Colors.border }]} />}
                 </View>
               );
@@ -85,18 +87,18 @@ export default function OrdersScreen() {
           </View>
         </View>
 
-        <Text style={styles.historyTitle}>Historial</Text>
-        {orders.map((order) => (
+        <Text style={styles.historyTitle}>{t.orders.historyTitle}</Text>
+        {ordersData.map((order) => (
           <TouchableOpacity key={order.id} activeOpacity={0.85} onPress={() => {}} style={styles.orderCard}>
             <View style={styles.orderLeft}>
               <View style={[styles.orderIcon, { backgroundColor: order.statusColor + '15' }]}>
                 <Package size={20} color={order.statusColor} strokeWidth={2.5} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.orderService}>{order.service}</Text>
+                <Text style={styles.orderService}>{t.orders.services[order.serviceKey]}</Text>
                 <Text style={styles.orderMeta}>{order.id} · {order.date}</Text>
                 <View style={[styles.statusPillSmall, { backgroundColor: order.statusColor + '15' }]}>
-                  <Text style={[styles.statusTextSmall, { color: order.statusColor }]}>{order.status}</Text>
+                  <Text style={[styles.statusTextSmall, { color: order.statusColor }]}>{t.orders.status[order.statusKey]}</Text>
                 </View>
               </View>
             </View>

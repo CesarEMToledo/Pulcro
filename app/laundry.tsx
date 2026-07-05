@@ -7,6 +7,7 @@ import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Minus, Plus, Truck, Shield, Leaf } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const MXN = (n: number) => `$${n.toLocaleString('es-MX')} MXN`;
 
@@ -24,6 +25,7 @@ function tierForKilos(k: number): number {
 
 export default function LaundryScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [kilos, setKilos] = useState(5);
 
   const selectedTier = tierForKilos(kilos);
@@ -39,7 +41,7 @@ export default function LaundryScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Ropa por Kilos" />
+      <ScreenHeader title={t.laundry.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.heroWrap}>
           <Image
@@ -47,20 +49,20 @@ export default function LaundryScreen() {
             style={styles.heroImage}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>Lavado por Kilos</Text>
-            <Text style={styles.heroSubtitle}>Recogemos, lavamos y entregamos en 48 hrs</Text>
+            <Text style={styles.heroTitle}>{t.laundry.heroTitle}</Text>
+            <Text style={styles.heroSubtitle}>{t.laundry.heroSubtitle}</Text>
           </LinearGradient>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>¿Cuánta ropa tienes?</Text>
+          <Text style={styles.sectionTitle}>{t.laundry.howMuch}</Text>
           <View style={styles.stepperCard}>
             <TouchableOpacity activeOpacity={0.7} onPress={decrease} style={styles.stepperBtn}>
               <Minus size={24} color={Colors.primary} strokeWidth={2.5} />
             </TouchableOpacity>
             <View style={styles.stepperValue}>
               <Text style={styles.kgValue}>{kilos}</Text>
-              <Text style={styles.kgLabel}>kilos</Text>
+              <Text style={styles.kgLabel}>{t.laundry.kg}</Text>
             </View>
             <TouchableOpacity activeOpacity={0.7} onPress={increase} style={styles.stepperBtn}>
               <Plus size={24} color={Colors.primary} strokeWidth={2.5} />
@@ -69,7 +71,7 @@ export default function LaundryScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Plan aplicado</Text>
+          <Text style={styles.sectionTitle}>{t.laundry.planApplied}</Text>
           {tiers.map((tier, i) => {
             const active = selectedTier === i;
             return (
@@ -83,19 +85,19 @@ export default function LaundryScreen() {
                   </View>
                   <View>
                     <Text style={[styles.tierKg, active && styles.tierKgActive]}>{tier.kg}</Text>
-                    <Text style={styles.tierPrice}>${tier.price} MXN por kg</Text>
+                    <Text style={styles.tierPrice}>${tier.price} MXN {t.laundry.perKg}</Text>
                   </View>
                 </View>
                 {active && (
                   <View style={styles.tierBadge}>
-                    <Text style={styles.tierBadgeText}>Aplicado</Text>
+                    <Text style={styles.tierBadgeText}>{t.laundry.applied}</Text>
                   </View>
                 )}
               </View>
             );
           })}
           <Text style={styles.tierHint}>
-            El plan se ajusta automáticamente según los kilos ingresados.
+            {t.laundry.hint}
           </Text>
         </View>
 
@@ -104,19 +106,19 @@ export default function LaundryScreen() {
             <View style={styles.featureIcon}>
               <Truck size={20} color={Colors.primary} strokeWidth={2.5} />
             </View>
-            <Text style={styles.featureText}>Recogida a domicilio</Text>
+            <Text style={styles.featureText}>{t.laundry.features.pickup}</Text>
           </View>
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
               <Shield size={20} color={Colors.secondary} strokeWidth={2.5} />
             </View>
-            <Text style={styles.featureText}>Garantía de calidad</Text>
+            <Text style={styles.featureText}>{t.laundry.features.quality}</Text>
           </View>
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
               <Leaf size={20} color={Colors.success} strokeWidth={2.5} />
             </View>
-            <Text style={styles.featureText}>Productos eco</Text>
+            <Text style={styles.featureText}>{t.laundry.features.eco}</Text>
           </View>
         </View>
 
@@ -126,17 +128,17 @@ export default function LaundryScreen() {
             <Text style={styles.summaryValue}>{MXN(total)}</Text>
           </View>
           <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
-            <Text style={styles.summaryLabel}>Envío</Text>
-            <Text style={styles.summaryValueFree}>Gratis</Text>
+            <Text style={styles.summaryLabel}>{t.common.shipping}</Text>
+            <Text style={styles.summaryValueFree}>{t.common.free}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>{t.common.total}</Text>
             <Text style={styles.totalValue}>{MXN(total)}</Text>
           </View>
         </View>
 
-        <PrimaryButton label="Agendar recogida" onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.laundry.scheduleButton} onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>

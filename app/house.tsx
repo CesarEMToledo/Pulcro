@@ -9,57 +9,53 @@ import { Clock, Home, Sparkles, Users, Calendar } from 'lucide-react-native';
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const plans = [
+const plansData = [
   {
-    name: 'Básico',
+    key: 'basic' as const,
     price: 500,
     duration: '3 hrs',
-    rooms: 'Hasta 3 cuartos',
     color: ['#1A6FD4', '#4A90E2'] as [string, string],
-    features: ['Limpieza de pisos', 'Polvo en superficies', 'Cocina y baño', 'Basura recogida'],
   },
   {
-    name: 'Profundo',
+    key: 'deep' as const,
     price: 850,
     duration: '5 hrs',
-    rooms: 'Toda la casa',
     color: ['#2ABFBF', '#00D4AA'] as [string, string],
-    features: ['Todo lo del Básico', 'Limpieza de ventanas', 'Desinfección profunda', 'Limpieza de muebles', 'Lavado de cortinas'],
     popular: true,
   },
   {
-    name: 'Premium',
+    key: 'premium' as const,
     price: 1200,
     duration: '8 hrs',
-    rooms: 'Toda la casa + extras',
     color: ['#0D4FA0', '#1A6FD4'] as [string, string],
-    features: ['Todo lo del Profundo', '2 especialistas', 'Carpetas y tapetes', 'Limpieza de cocina profunda', 'Organización de espacios'],
   },
 ];
 
-const extras = [
-  { name: 'Limpieza de horno', price: 80 },
-  { name: 'Limpieza de refrigerador', price: 100 },
-  { name: 'Lavado de ventanas extra', price: 60 },
-  { name: 'Planchado de ropa', price: 120 },
+const extrasData = [
+  { key: 'oven' as const, price: 80 },
+  { key: 'fridge' as const, price: 100 },
+  { key: 'windows' as const, price: 60 },
+  { key: 'ironing' as const, price: 120 },
 ];
 
 export default function HouseScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState(1);
   const [extrasSel, setExtrasSel] = useState<string[]>([]);
 
-  const toggleExtra = (name: string) => {
-    setExtrasSel((prev) => (prev.includes(name) ? prev.filter((e) => e !== name) : [...prev, name]));
+  const toggleExtra = (key: string) => {
+    setExtrasSel((prev) => (prev.includes(key) ? prev.filter((e) => e !== key) : [...prev, key]));
   };
 
-  const extrasTotal = extrasSel.reduce((sum, name) => sum + (extras.find((e) => e.name === name)?.price || 0), 0);
-  const total = plans[selectedPlan].price + extrasTotal;
+  const extrasTotal = extrasSel.reduce((sum, key) => sum + (extrasData.find((e) => e.key === key)?.price || 0), 0);
+  const total = plansData[selectedPlan].price + extrasTotal;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Limpieza de Casas" />
+      <ScreenHeader title={t.house.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.heroWrap}>
           <Image
@@ -67,27 +63,27 @@ export default function HouseScreen() {
             style={styles.heroImage}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>Profesionales a tu hogar</Text>
-            <Text style={styles.heroSubtitle}>Personal verificado y con seguro</Text>
+            <Text style={styles.heroTitle}>{t.house.heroTitle}</Text>
+            <Text style={styles.heroSubtitle}>{t.house.heroSubtitle}</Text>
           </LinearGradient>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Elige tu plan</Text>
-          {plans.map((plan, i) => (
+          <Text style={styles.sectionTitle}>{t.house.choosePlan}</Text>
+          {plansData.map((plan, i) => (
             <TouchableOpacity
-              key={plan.name}
+              key={plan.key}
               activeOpacity={0.7}
               onPress={() => setSelectedPlan(i)}
               style={[styles.planCard, selectedPlan === i && styles.planCardActive]}
             >
               <LinearGradient colors={plan.color} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.planHeader}>
                 <View style={styles.planHeaderLeft}>
-                  <Text style={styles.planName}>{plan.name}</Text>
+                  <Text style={styles.planName}>{t.house.plans[plan.key].name}</Text>
                   {plan.popular && (
                     <View style={styles.popularBadge}>
                       <Sparkles size={10} color={Colors.white} strokeWidth={2.5} />
-                      <Text style={styles.popularText}>Popular</Text>
+                      <Text style={styles.popularText}>{t.common.popular}</Text>
                     </View>
                   )}
                 </View>
@@ -101,10 +97,10 @@ export default function HouseScreen() {
                   </View>
                   <View style={styles.planMetaItem}>
                     <Home size={14} color={Colors.textMuted} strokeWidth={2.5} />
-                    <Text style={styles.planMetaText}>{plan.rooms}</Text>
+                    <Text style={styles.planMetaText}>{t.house.plans[plan.key].rooms}</Text>
                   </View>
                 </View>
-                {plan.features.map((feat) => (
+                {t.house.plans[plan.key].features.map((feat) => (
                   <View key={feat} style={styles.featureRow}>
                     <View style={styles.featureDot} />
                     <Text style={styles.featureText}>{feat}</Text>
@@ -116,19 +112,19 @@ export default function HouseScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Servicios extra</Text>
-          {extras.map((extra) => (
+          <Text style={styles.sectionTitle}>{t.house.extraServices}</Text>
+          {extrasData.map((extra) => (
             <TouchableOpacity
-              key={extra.name}
+              key={extra.key}
               activeOpacity={0.7}
-              onPress={() => toggleExtra(extra.name)}
-              style={[styles.extraCard, extrasSel.includes(extra.name) && styles.extraCardActive]}
+              onPress={() => toggleExtra(extra.key)}
+              style={[styles.extraCard, extrasSel.includes(extra.key) && styles.extraCardActive]}
             >
               <View style={styles.extraLeft}>
-                <View style={[styles.checkbox, extrasSel.includes(extra.name) && styles.checkboxActive]}>
-                  {extrasSel.includes(extra.name) && <Text style={styles.checkText}>✓</Text>}
+                <View style={[styles.checkbox, extrasSel.includes(extra.key) && styles.checkboxActive]}>
+                  {extrasSel.includes(extra.key) && <Text style={styles.checkText}>✓</Text>}
                 </View>
-                <Text style={styles.extraName}>{extra.name}</Text>
+                <Text style={styles.extraName}>{t.house.extras[extra.key]}</Text>
               </View>
               <Text style={styles.extraPrice}>+{MXN(extra.price)}</Text>
             </TouchableOpacity>
@@ -137,23 +133,23 @@ export default function HouseScreen() {
 
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Plan {plans[selectedPlan].name}</Text>
-            <Text style={styles.summaryValue}>{MXN(plans[selectedPlan].price)}</Text>
+            <Text style={styles.summaryLabel}>{t.house.planLabel} {t.house.plans[plansData[selectedPlan].key].name}</Text>
+            <Text style={styles.summaryValue}>{MXN(plansData[selectedPlan].price)}</Text>
           </View>
           {extrasSel.length > 0 && (
             <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
-              <Text style={styles.summaryLabel}>Extras ({extrasSel.length})</Text>
+              <Text style={styles.summaryLabel}>{t.house.extrasLabel} ({extrasSel.length})</Text>
               <Text style={styles.summaryValue}>{MXN(extrasTotal)}</Text>
             </View>
           )}
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>{t.common.total}</Text>
             <Text style={styles.totalValue}>{MXN(total)}</Text>
           </View>
         </View>
 
-        <PrimaryButton label="Agendar limpieza" onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.house.scheduleButton} onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>

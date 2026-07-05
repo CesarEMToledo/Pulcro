@@ -9,52 +9,51 @@ import { Car, Sparkles, Droplets, Wind } from 'lucide-react-native';
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const services = [
+const servicesData = [
   {
-    name: 'Lavado Exterior',
+    key: 'exterior' as const,
     price: 120,
     duration: '45 min',
     icon: Droplets,
     color: ['#1A6FD4', '#4A90E2'] as [string, string],
-    features: ['Lavado de carrocería', 'Secado con microfibra', 'Limpieza de llantas', 'Limpieza de cristales'],
   },
   {
-    name: 'Lavado Completo',
+    key: 'full' as const,
     price: 250,
     duration: '1.5 hrs',
     icon: Car,
     color: ['#2ABFBF', '#00D4AA'] as [string, string],
-    features: ['Todo lo del Exterior', 'Aspirado interior', 'Limpieza de tablero', 'Limpieza de puertas', 'Aromatizante'],
     popular: true,
   },
   {
-    name: 'Detallado Premium',
+    key: 'premium' as const,
     price: 600,
     duration: '4 hrs',
     icon: Sparkles,
     color: ['#0D4FA0', '#1A6FD4'] as [string, string],
-    features: ['Todo lo del Completo', 'Pulido de pintura', 'Encerado profundo', 'Limpieza de motor', 'Tratamiento de cuero', 'Desinfección ozone'],
   },
 ];
 
-const vehicleTypes = [
-  { name: 'Sedán', extra: 0 },
-  { name: 'SUV', extra: 50 },
-  { name: 'Pickup', extra: 80 },
-  { name: 'Van', extra: 100 },
+const vehicleTypesData = [
+  { key: 'sedan' as const, extra: 0 },
+  { key: 'suv' as const, extra: 50 },
+  { key: 'pickup' as const, extra: 80 },
+  { key: 'van' as const, extra: 100 },
 ];
 
 export default function CarScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [selectedService, setSelectedService] = useState(1);
   const [selectedVehicle, setSelectedVehicle] = useState(0);
 
-  const total = services[selectedService].price + vehicleTypes[selectedVehicle].extra;
+  const total = servicesData[selectedService].price + vehicleTypesData[selectedVehicle].extra;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Limpieza de Carros" />
+      <ScreenHeader title={t.car.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.heroWrap}>
           <Image
@@ -62,22 +61,22 @@ export default function CarScreen() {
             style={styles.heroImage}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>Detallado a domicilio</Text>
-            <Text style={styles.heroSubtitle}>Vamos hasta donde estés</Text>
+            <Text style={styles.heroTitle}>{t.car.heroTitle}</Text>
+            <Text style={styles.heroSubtitle}>{t.car.heroSubtitle}</Text>
           </LinearGradient>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tipo de vehículo</Text>
+          <Text style={styles.sectionTitle}>{t.car.vehicleType}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.vehicleScroll}>
-            {vehicleTypes.map((v, i) => (
+            {vehicleTypesData.map((v, i) => (
               <TouchableOpacity
-                key={v.name}
+                key={v.key}
                 activeOpacity={0.7}
                 onPress={() => setSelectedVehicle(i)}
                 style={[styles.vehicleChip, selectedVehicle === i && styles.vehicleChipActive]}
               >
-                <Text style={[styles.vehicleText, selectedVehicle === i && styles.vehicleTextActive]}>{v.name}</Text>
+                <Text style={[styles.vehicleText, selectedVehicle === i && styles.vehicleTextActive]}>{t.car.vehicles[v.key]}</Text>
                 {v.extra > 0 && <Text style={[styles.vehicleExtra, selectedVehicle === i && styles.vehicleExtraActive]}>+{MXN(v.extra)}</Text>}
               </TouchableOpacity>
             ))}
@@ -85,12 +84,12 @@ export default function CarScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Elige el servicio</Text>
-          {services.map((svc, i) => {
+          <Text style={styles.sectionTitle}>{t.car.chooseService}</Text>
+          {servicesData.map((svc, i) => {
             const Icon = svc.icon;
             return (
               <TouchableOpacity
-                key={svc.name}
+                key={svc.key}
                 activeOpacity={0.7}
                 onPress={() => setSelectedService(i)}
                 style={[styles.svcCard, selectedService === i && styles.svcCardActive]}
@@ -101,11 +100,11 @@ export default function CarScreen() {
                   </LinearGradient>
                   <View style={{ flex: 1 }}>
                     <View style={styles.svcTitleRow}>
-                      <Text style={styles.svcName}>{svc.name}</Text>
+                      <Text style={styles.svcName}>{t.car.services[svc.key].name}</Text>
                       {svc.popular && (
                         <View style={styles.popularBadge}>
                           <Sparkles size={10} color={Colors.white} strokeWidth={2.5} />
-                          <Text style={styles.popularText}>Popular</Text>
+                          <Text style={styles.popularText}>{t.common.popular}</Text>
                         </View>
                       )}
                     </View>
@@ -115,7 +114,7 @@ export default function CarScreen() {
                 </View>
                 {selectedService === i && (
                   <View style={styles.svcFeatures}>
-                    {svc.features.map((feat) => (
+                    {t.car.services[svc.key].features.map((feat) => (
                       <View key={feat} style={styles.featureRow}>
                         <View style={styles.featureDot} />
                         <Text style={styles.featureText}>{feat}</Text>
@@ -130,23 +129,23 @@ export default function CarScreen() {
 
         <View style={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>{services[selectedService].name} · {vehicleTypes[selectedVehicle].name}</Text>
-            <Text style={styles.summaryValue}>{MXN(services[selectedService].price)}</Text>
+            <Text style={styles.summaryLabel}>{t.car.services[servicesData[selectedService].key].name} · {t.car.vehicles[vehicleTypesData[selectedVehicle].key]}</Text>
+            <Text style={styles.summaryValue}>{MXN(servicesData[selectedService].price)}</Text>
           </View>
-          {vehicleTypes[selectedVehicle].extra > 0 && (
+          {vehicleTypesData[selectedVehicle].extra > 0 && (
             <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
-              <Text style={styles.summaryLabel}>Cargo por vehículo</Text>
-              <Text style={styles.summaryValue}>+{MXN(vehicleTypes[selectedVehicle].extra)}</Text>
+              <Text style={styles.summaryLabel}>{t.car.vehicleSurcharge}</Text>
+              <Text style={styles.summaryValue}>+{MXN(vehicleTypesData[selectedVehicle].extra)}</Text>
             </View>
           )}
           <View style={styles.divider} />
           <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>{t.common.total}</Text>
             <Text style={styles.totalValue}>{MXN(total)}</Text>
           </View>
         </View>
 
-        <PrimaryButton label="Agendar lavado" onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.car.scheduleButton} onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>

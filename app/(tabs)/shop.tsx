@@ -3,56 +3,58 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Search, ShoppingBag, Star } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 import { useState } from 'react';
 
-const categories = ['Todos', 'Detergentes', 'Desinfectantes', 'Accesorios', 'Eco'];
+const categoryKeys = ['all', 'detergents', 'disinfectants', 'accessories', 'eco'] as const;
 
-const products = [
-  { name: 'Detergente Pulcro Pro', price: 85, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.8, cat: 'Detergentes' },
-  { name: 'Desinfectante Multiusos', price: 65, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.7, cat: 'Desinfectantes' },
-  { name: 'Esponjas Premium (3pz)', price: 45, unit: 'Pack', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.9, cat: 'Accesorios' },
-  { name: 'Limpiador Ecológico Bio', price: 95, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 5.0, cat: 'Eco' },
-  { name: 'Suavizante Floral', price: 55, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.6, cat: 'Detergentes' },
-  { name: 'Cera para Pisos', price: 75, unit: '500ml', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.5, cat: 'Accesorios' },
+const productsData = [
+  { key: 'detergentPro' as const, price: 85, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.8, cat: 'detergents' as const },
+  { key: 'disinfectant' as const, price: 65, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.7, cat: 'disinfectants' as const },
+  { key: 'sponges' as const, price: 45, unit: 'Pack', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.9, cat: 'accessories' as const },
+  { key: 'ecoCleaner' as const, price: 95, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 5.0, cat: 'eco' as const },
+  { key: 'softener' as const, price: 55, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.6, cat: 'detergents' as const },
+  { key: 'floorWax' as const, price: 75, unit: '500ml', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.5, cat: 'accessories' as const },
 ];
 
 export default function ShopScreen() {
   const router = useRouter();
-  const [activeCat, setActiveCat] = useState('Todos');
+  const { t } = useLanguage();
+  const [activeCat, setActiveCat] = useState<typeof categoryKeys[number]>('all');
 
-  const filtered = activeCat === 'Todos' ? products : products.filter((p) => p.cat === activeCat);
+  const filtered = activeCat === 'all' ? productsData : productsData.filter((p) => p.cat === activeCat);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Tienda" showBack={false} rightIcon={<ShoppingBag size={20} color={Colors.primary} strokeWidth={2.5} />} onRightPress={() => router.push('/cart')} />
+      <ScreenHeader title={t.shop.title} showBack={false} rightIcon={<ShoppingBag size={20} color={Colors.primary} strokeWidth={2.5} />} onRightPress={() => router.push('/cart')} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.searchBar}>
           <Search size={18} color={Colors.textMuted} strokeWidth={2.5} />
-          <Text style={styles.searchPlaceholder}>Buscar productos de limpieza...</Text>
+          <Text style={styles.searchPlaceholder}>{t.shop.searchPlaceholder}</Text>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.catScroll}>
-          {categories.map((cat) => (
+          {categoryKeys.map((cat) => (
             <TouchableOpacity
               key={cat}
               activeOpacity={0.7}
               onPress={() => setActiveCat(cat)}
               style={[styles.catChip, activeCat === cat && styles.catChipActive]}
             >
-              <Text style={[styles.catText, activeCat === cat && styles.catTextActive]}>{cat}</Text>
+              <Text style={[styles.catText, activeCat === cat && styles.catTextActive]}>{t.shop.categories[cat]}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         <View style={styles.grid}>
           {filtered.map((prod) => (
-            <TouchableOpacity key={prod.name} activeOpacity={0.85} onPress={() => router.push('/cart')} style={styles.productCard}>
+            <TouchableOpacity key={prod.key} activeOpacity={0.85} onPress={() => router.push('/cart')} style={styles.productCard}>
               <Image source={{ uri: prod.image }} style={styles.productImage} />
               <View style={styles.productInfo}>
-                <Text style={styles.productName} numberOfLines={2}>{prod.name}</Text>
+                <Text style={styles.productName} numberOfLines={2}>{t.shop.products[prod.key]}</Text>
                 <View style={styles.ratingRow}>
                   <Star size={12} color={Colors.warning} strokeWidth={2.5} fill={Colors.warning} />
                   <Text style={styles.ratingText}>{prod.rating}</Text>
@@ -60,7 +62,7 @@ export default function ShopScreen() {
                 <View style={styles.priceRow}>
                   <View>
                     <Text style={styles.price}>{MXN(prod.price)}</Text>
-                    <Text style={styles.unit}>{prod.unit}</Text>
+                    <Text style={styles.unit}>{prod.unit === 'Pack' ? t.shop.unitPack : prod.unit}</Text>
                   </View>
                   <TouchableOpacity activeOpacity={0.7} style={styles.addButton}>
                     <ShoppingBag size={16} color={Colors.white} strokeWidth={2.5} />
