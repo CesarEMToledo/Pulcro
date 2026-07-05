@@ -15,7 +15,7 @@ import SectionHeader from '@/components/SectionHeader';
 const categoriesData = [
   {
     key: 'laundry' as const,
-    image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://images.pexels.com/photos/7989576/pexels-photo-7989576.jpeg?auto=compress&cs=tinysrgb&w=400',
     gradient: ['#1A6FD4', '#4A90E2'] as [string, string],
     route: '/laundry' as const,
   },
@@ -57,7 +57,7 @@ const popularServicesData = [
   {
     key: 'laundry5kg' as const,
     price: 150,
-    image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=300',
+    image: 'https://images.pexels.com/photos/8453415/pexels-photo-8453415.jpeg?auto=compress&cs=tinysrgb&w=300',
     rating: 5.0,
     time: '48 hrs',
   },
@@ -105,7 +105,7 @@ export default function HomeScreen() {
               </View>
             </View>
             <Image
-              source={{ uri: 'https://images.pexels.com/photos/6210766/pexels-photo-6210766.jpeg?auto=compress&cs=tinysrgb&w=300' }}
+              source={{ uri: 'https://images.pexels.com/photos/4210378/pexels-photo-4210378.jpeg?auto=compress&cs=tinysrgb&w=300' }}
               style={styles.heroImage}
             />
           </LinearGradient>
