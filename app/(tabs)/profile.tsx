@@ -12,7 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import {
   ChevronRight,
   MapPin,
@@ -26,6 +29,8 @@ import {
   Check,
   Plus,
   Trash2,
+  User,
+  Image as ImageIcon,
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import LanguageToggle from '@/components/LanguageToggle';
@@ -35,9 +40,54 @@ type Address = { id: string; label: string; text: string };
 type PaymentMethod = { id: string; label: string; last4: string };
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { t } = useLanguage();
   const [showAddresses, setShowAddresses] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+
+  const [profile, setProfile] = useState({
+    name: 'Carlos Mendoza',
+    email: 'carlos.mendoza@email.com',
+    phone: '+52 55 1234 5678',
+    photoUri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200' as string | null,
+  });
+  const [editName, setEditName] = useState(profile.name);
+  const [editPhotoUri, setEditPhotoUri] = useState<string | null>(profile.photoUri);
+  const [photoPermissionDenied, setPhotoPermissionDenied] = useState(false);
+
+  const openEditProfile = () => {
+    setEditName(profile.name);
+    setEditPhotoUri(profile.photoUri);
+    setPhotoPermissionDenied(false);
+    setShowEditProfile(true);
+  };
+
+  const pickProfilePhoto = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setPhotoPermissionDenied(true);
+      return;
+    }
+    setPhotoPermissionDenied(false);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets && result.assets[0]) {
+      setEditPhotoUri(result.assets[0].uri);
+    }
+  };
+
+  const removeProfilePhoto = () => setEditPhotoUri(null);
+
+  const saveProfile = () => {
+    if (!editName.trim()) return;
+    setProfile((prev) => ({ ...prev, name: editName.trim(), photoUri: editPhotoUri }));
+    setShowEditProfile(false);
+  };
 
   const INITIAL_ADDRESSES: Address[] = [
     { id: 'a1', label: t.profile.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
@@ -80,7 +130,7 @@ export default function ProfileScreen() {
   const menuItems = [
     { icon: MapPin, label: t.profile.menu.addresses, color: Colors.primary, action: () => setShowAddresses(true) },
     { icon: CreditCard, label: t.profile.menu.payments, color: Colors.secondary, action: () => setShowPayments(true) },
-    { icon: Bell, label: t.profile.menu.notifications, color: Colors.warning, action: () => {} },
+    { icon: Bell, label: t.profile.menu.notifications, color: Colors.warning, action: () => router.push('/notifications') },
     { icon: Heart, label: t.profile.menu.favorites, color: Colors.error, action: () => {} },
     { icon: Shield, label: t.profile.menu.privacy, color: Colors.primary, action: () => {} },
     { icon: HelpCircle, label: t.profile.menu.help, color: Colors.secondary, action: () => {} },
@@ -92,17 +142,20 @@ export default function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileCard}>
           <View style={styles.avatarWrap}>
-            <Image
-              source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200' }}
-              style={styles.avatar}
-            />
-            <View style={styles.editBadge}>
+            {profile.photoUri ? (
+              <Image source={{ uri: profile.photoUri }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <User size={36} color={Colors.textMuted} strokeWidth={2} />
+              </View>
+            )}
+            <TouchableOpacity activeOpacity={0.7} onPress={openEditProfile} style={styles.editBadge}>
               <Text style={styles.editText}>{t.profile.edit}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.name}>Carlos Mendoza</Text>
-          <Text style={styles.email}>carlos.mendoza@email.com</Text>
-          <Text style={styles.phone}>+52 55 1234 5678</Text>
+          <Text style={styles.name}>{profile.name}</Text>
+          <Text style={styles.email}>{profile.email}</Text>
+          <Text style={styles.phone}>{profile.phone}</Text>
 
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
@@ -279,18 +332,82 @@ export default function ProfileScreen() {
           </KeyboardAvoidingView>
         </View>
       </Modal>
+
+      {/* Edit Profile Modal */}
+      <Modal visible={showEditProfile} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t.profile.editModal.title}</Text>
+              <TouchableOpacity onPress={() => setShowEditProfile(false)} style={styles.modalClose}>
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.editAvatarSection}>
+              {editPhotoUri ? (
+                <Image source={{ uri: editPhotoUri }} style={styles.editAvatarImg} />
+              ) : (
+                <View style={styles.editAvatarPlaceholder}>
+                  <User size={36} color={Colors.textMuted} strokeWidth={2} />
+                </View>
+              )}
+              <View style={styles.editAvatarActions}>
+                <TouchableOpacity activeOpacity={0.7} onPress={pickProfilePhoto} style={styles.avatarActionBtn}>
+                  <ImageIcon size={16} color={Colors.primary} strokeWidth={2.5} />
+                  <Text style={styles.avatarActionText}>{t.profile.editModal.changePhoto}</Text>
+                </TouchableOpacity>
+                {editPhotoUri && (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={removeProfilePhoto}
+                    style={[styles.avatarActionBtn, styles.avatarActionBtnDanger]}
+                  >
+                    <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
+                    <Text style={[styles.avatarActionText, { color: Colors.error }]}>{t.profile.editModal.removePhoto}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+            {photoPermissionDenied && (
+              <Text style={styles.permissionText}>{t.profile.editModal.permissionDenied}</Text>
+            )}
+
+            <View style={styles.newItemWrap}>
+              <Text style={styles.newItemLabel}>{t.profile.editModal.nameLabel}</Text>
+              <TextInput
+                value={editName}
+                onChangeText={setEditName}
+                placeholder={t.profile.editModal.namePlaceholder}
+                placeholderTextColor={Colors.textMuted}
+                style={styles.input}
+              />
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={saveProfile}
+                style={[styles.addBtn, !editName.trim() && { opacity: 0.4 }]}
+              >
+                <Check size={16} color={Colors.white} strokeWidth={2.5} />
+                <Text style={styles.addBtnText}>{t.profile.editModal.saveButton}</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   profileCard: { backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.lg, alignItems: 'center', marginBottom: Spacing.xl, ...Shadow.md },
   avatarWrap: { position: 'relative', marginBottom: Spacing.md },
-  avatar: { width: 90, height: 90, borderRadius: Radius.full, resizeMode: 'cover' },
+  avatar: { width: moderateScale(90), height: moderateScale(90), borderRadius: Radius.full, resizeMode: 'cover' },
+  avatarPlaceholder: { width: moderateScale(90), height: moderateScale(90), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   editBadge: { position: 'absolute', bottom: 0, right: -4, backgroundColor: Colors.primary, paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: Radius.full, ...Shadow.sm },
-  editText: { fontSize: 10, fontWeight: '700', color: Colors.white },
+  editText: { fontSize: FontSize.xs - 1, fontWeight: '700', color: Colors.white },
   name: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.textPrimary },
   email: { fontSize: FontSize.md, color: Colors.textSecondary, marginTop: 2 },
   phone: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
@@ -298,10 +415,10 @@ const styles = StyleSheet.create({
   statItem: { flex: 1, alignItems: 'center' },
   statValue: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.primary },
   statLabel: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2 },
-  statDivider: { width: 1, height: 32, backgroundColor: Colors.border },
+  statDivider: { width: 1, height: moderateScale(32), backgroundColor: Colors.border },
   menuSection: { backgroundColor: Colors.white, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, marginBottom: Spacing.lg, ...Shadow.sm },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md + 2, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  menuIcon: { width: 40, height: 40, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  menuIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   menuLabel: { flex: 1, fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
   logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: Colors.error + '10', borderRadius: Radius.lg, paddingVertical: Spacing.md, marginBottom: Spacing.md },
   logoutText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.error },
@@ -310,18 +427,26 @@ const styles = StyleSheet.create({
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalSheet: { backgroundColor: Colors.white, borderTopLeftRadius: Radius.xl, borderTopRightRadius: Radius.xl, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl, maxHeight: '90%' },
-  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
-  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
-  modalClose: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  modalHandle: { width: moderateScale(40), height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.md },
+  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, flex: 1 },
+  modalClose: { width: moderateScale(32), height: moderateScale(32), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
 
   optionRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  optionIcon: { width: 40, height: 40, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  optionIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   optionLabel: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   optionText: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
-  trashBtn: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
+  trashBtn: { width: moderateScale(32), height: moderateScale(32), borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
   emptyModalText: { fontSize: FontSize.md, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.xl },
 
+  editAvatarSection: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg, marginBottom: Spacing.md },
+  editAvatarImg: { width: moderateScale(80), height: moderateScale(80), borderRadius: Radius.full, resizeMode: 'cover' },
+  editAvatarPlaceholder: { width: moderateScale(80), height: moderateScale(80), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  editAvatarActions: { flex: 1, gap: Spacing.sm },
+  avatarActionBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: Colors.primary + '12', borderRadius: Radius.lg, paddingVertical: Spacing.sm + 2 },
+  avatarActionBtnDanger: { backgroundColor: Colors.error + '10' },
+  avatarActionText: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.primary },
+  permissionText: { fontSize: FontSize.xs, color: Colors.error, marginBottom: Spacing.md },
   newItemWrap: { marginTop: Spacing.lg },
   newItemLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary, marginBottom: Spacing.sm },
   input: { borderWidth: 1.5, borderColor: Colors.border, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, fontSize: FontSize.md, color: Colors.textPrimary, marginBottom: Spacing.sm, backgroundColor: Colors.white },

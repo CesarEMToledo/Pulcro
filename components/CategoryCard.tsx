@@ -1,19 +1,30 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Radius, Spacing, FontSize, Shadow } from '@/constants/theme';
 import { ChevronRight } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface Props {
   title: string;
   description: string;
-  image: string;
+  icon: React.ReactNode;
   gradient: [string, string];
   onPress: () => void;
 }
 
-export default function CategoryCard({ title, description, image, gradient, onPress }: Props) {
+// The icon components (LaundryIcon, GarmentsIcon, etc.) are drawn at this
+// intrinsic size by default; we scale them visually via transform so they
+// stay crisp vector SVGs at any device width.
+const BASE_ICON_SIZE = 92;
+
+export default function CategoryCard({ title, description, icon, gradient, onPress }: Props) {
   const { t } = useLanguage();
+  const { wp, isTablet } = useResponsive();
+
+  const iconSize = Math.max(72, Math.min(isTablet ? 132 : 104, wp(24)));
+  const iconScale = iconSize / BASE_ICON_SIZE;
+
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={styles.container}>
       <LinearGradient colors={gradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
@@ -26,7 +37,9 @@ export default function CategoryCard({ title, description, image, gradient, onPr
               <ChevronRight size={16} color={Colors.white} strokeWidth={2.5} />
             </View>
           </View>
-          <Image source={{ uri: image }} style={styles.image} />
+          <View style={[styles.iconWrap, { width: iconSize, height: iconSize }]}>
+            <View style={{ transform: [{ scale: iconScale }] }}>{icon}</View>
+          </View>
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -75,10 +88,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
-  image: {
-    width: 90,
-    height: 90,
-    borderRadius: Radius.md,
-    resizeMode: 'cover',
+  iconWrap: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

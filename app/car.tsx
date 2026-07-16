@@ -3,7 +3,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Car, Sparkles, Droplets, Wind } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -48,6 +50,8 @@ export default function CarScreen() {
   const { t } = useLanguage();
   const [selectedService, setSelectedService] = useState(1);
   const [selectedVehicle, setSelectedVehicle] = useState(0);
+  const { hp } = useResponsive();
+  const heroHeight = Math.max(140, Math.min(260, hp(22)));
 
   const total = servicesData[selectedService].price + vehicleTypesData[selectedVehicle].extra;
 
@@ -58,7 +62,7 @@ export default function CarScreen() {
         <View style={styles.heroWrap}>
           <Image
             source={{ uri: 'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg?auto=compress&cs=tinysrgb&w=600' }}
-            style={styles.heroImage}
+            style={[styles.heroImage, { height: heroHeight }]}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{t.car.heroTitle}</Text>
@@ -154,9 +158,9 @@ export default function CarScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   heroWrap: { borderRadius: Radius.xl, overflow: 'hidden', marginBottom: Spacing.xl, ...Shadow.md },
-  heroImage: { width: '100%', height: 180, resizeMode: 'cover' },
+  heroImage: { width: '100%', resizeMode: 'cover' },
   heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.lg, justifyContent: 'flex-end' },
   heroTitle: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.white },
   heroSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
@@ -164,27 +168,27 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
   vehicleScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
   vehicleChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.white, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, borderRadius: Radius.lg, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  vehicleChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
+  vehicleChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '12' },
   vehicleText: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   vehicleTextActive: { color: Colors.primary },
   vehicleExtra: { fontSize: FontSize.xs, color: Colors.textMuted },
   vehicleExtraActive: { color: Colors.primary },
   svcCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  svcCardActive: { borderColor: Colors.primary },
+  svcCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '10' },
   svcHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  svcIcon: { width: 48, height: 48, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  svcIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   svcTitleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  svcName: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary },
-  popularBadge: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: Colors.secondary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: Radius.full },
-  popularText: { fontSize: 10, fontWeight: '700', color: Colors.white },
+  svcName: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary, flexShrink: 1 },
+  popularBadge: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: Colors.secondary, paddingHorizontal: moderateScale(6), paddingVertical: 2, borderRadius: Radius.full },
+  popularText: { fontSize: FontSize.xs - 1, fontWeight: '700', color: Colors.white },
   svcDuration: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   svcPrice: { fontSize: FontSize.lg, fontWeight: '800', color: Colors.primary },
   svcFeatures: { marginTop: Spacing.md, paddingTop: Spacing.md, borderTopWidth: 1, borderTopColor: Colors.border },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: 6 },
-  featureDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.secondary },
+  featureDot: { width: moderateScale(6), height: moderateScale(6), borderRadius: moderateScale(3), backgroundColor: Colors.secondary },
   featureText: { fontSize: FontSize.sm, color: Colors.textSecondary },
   summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm },
   summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary, flex: 1 },
   summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },

@@ -3,7 +3,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Minus, Plus, Truck, Shield, Leaf } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -27,6 +29,8 @@ export default function LaundryScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const [kilos, setKilos] = useState(5);
+  const { hp } = useResponsive();
+  const heroHeight = Math.max(140, Math.min(260, hp(22)));
 
   const selectedTier = tierForKilos(kilos);
   const total = kilos * tiers[selectedTier].price;
@@ -46,7 +50,7 @@ export default function LaundryScreen() {
         <View style={styles.heroWrap}>
           <Image
             source={{ uri: 'https://images.pexels.com/photos/7989576/pexels-photo-7989576.jpeg?auto=compress&cs=tinysrgb&w=600' }}
-            style={styles.heroImage}
+            style={[styles.heroImage, { height: heroHeight }]}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{t.laundry.heroTitle}</Text>
@@ -147,25 +151,25 @@ export default function LaundryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   heroWrap: { borderRadius: Radius.xl, overflow: 'hidden', marginBottom: Spacing.xl, ...Shadow.md },
-  heroImage: { width: '100%', height: 180, resizeMode: 'cover' },
+  heroImage: { width: '100%', resizeMode: 'cover' },
   heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.lg, justifyContent: 'flex-end' },
   heroTitle: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.white },
   heroSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
   section: { marginBottom: Spacing.xl },
   sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
   stepperCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  stepperBtn: { width: 48, height: 48, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  stepperBtn: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   stepperValue: { alignItems: 'center' },
   kgValue: { fontSize: FontSize.xxxl, fontWeight: '800', color: Colors.textPrimary },
   kgLabel: { fontSize: FontSize.sm, color: Colors.textMuted },
-  tierCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  tierCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
-  tierLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  radio: { width: 22, height: 22, borderRadius: Radius.full, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
+  tierCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.sm, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
+  tierCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '12' },
+  tierLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
+  radio: { width: moderateScale(22), height: moderateScale(22), borderRadius: Radius.full, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
   radioActive: { borderColor: Colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
+  radioDot: { width: moderateScale(10), height: moderateScale(10), borderRadius: moderateScale(5), backgroundColor: Colors.primary },
   tierKg: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   tierKgActive: { color: Colors.primary },
   tierPrice: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
@@ -174,11 +178,11 @@ const styles = StyleSheet.create({
   tierHint: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.sm, textAlign: 'center' },
   featuresRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.xl },
   featureItem: { alignItems: 'center', flex: 1 },
-  featureIcon: { width: 48, height: 48, borderRadius: Radius.md, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
+  featureIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.md, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
   featureText: { fontSize: FontSize.xs, fontWeight: '500', color: Colors.textSecondary, textAlign: 'center' },
   summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm },
+  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary, flex: 1 },
   summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   summaryValueFree: { fontSize: FontSize.md, fontWeight: '700', color: Colors.success },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },

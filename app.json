@@ -31,6 +31,12 @@
         {
           "locationWhenInUsePermission": "Pulcro usa tu ubicación para confirmar la dirección de recogida y entrega de tus pedidos."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Pulcro necesita acceso a tus fotos para que puedas actualizar tu foto de perfil."
+        }
       ]
     ],
     "experiments": {

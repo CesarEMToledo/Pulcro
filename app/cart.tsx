@@ -14,7 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import {
   MapPin,
   CreditCard,
@@ -478,28 +479,28 @@ export default function CartScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
 
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xxl },
-  emptyIcon: { width: 88, height: 88, borderRadius: Radius.xl, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.lg },
+  emptyIcon: { width: moderateScale(88), height: moderateScale(88), borderRadius: Radius.xl, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.lg },
   emptyTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.sm },
   emptySubtitle: { fontSize: FontSize.md, color: Colors.textMuted, textAlign: 'center', marginBottom: Spacing.xl },
   emptyBtn: { backgroundColor: Colors.primary, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md, borderRadius: Radius.lg },
   emptyBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.white },
 
   cartItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, ...Shadow.sm },
-  itemImage: { width: 64, height: 64, borderRadius: Radius.md, resizeMode: 'cover' },
+  itemImage: { width: moderateScale(64), height: moderateScale(64), borderRadius: Radius.md, resizeMode: 'cover' },
   itemInfo: { flex: 1 },
   itemName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   itemDetail: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   itemPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary, marginTop: 4 },
-  removeBtn: { width: 36, height: 36, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
+  removeBtn: { width: moderateScale(36), height: moderateScale(36), borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
 
   sectionCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, ...Shadow.sm },
   sectionTitle: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
 
   addressRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  addressIcon: { width: 40, height: 40, borderRadius: Radius.md, backgroundColor: Colors.primary + '15', justifyContent: 'center', alignItems: 'center' },
+  addressIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, backgroundColor: Colors.primary + '15', justifyContent: 'center', alignItems: 'center' },
   addressLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textPrimary },
   addressText: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   changeBtn: { paddingHorizontal: Spacing.sm, paddingVertical: 6, borderRadius: Radius.full, backgroundColor: Colors.primary + '12' },
@@ -510,14 +511,15 @@ const styles = StyleSheet.create({
   scheduleText: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
 
   paymentRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  paymentIcon: { width: 40, height: 40, borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  paymentIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
   paymentText: { flex: 1, fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
 
   summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm },
+  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary, flex: 1 },
   summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   summaryValueFree: { fontSize: FontSize.md, fontWeight: '700', color: Colors.success },
+  discountValue: { fontSize: FontSize.md, fontWeight: '700', color: Colors.success },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },
   totalLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
   totalValue: { fontSize: FontSize.xxl, fontWeight: '800', color: Colors.primary },
@@ -525,16 +527,16 @@ const styles = StyleSheet.create({
   // Modals shared
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalSheet: { backgroundColor: Colors.white, borderTopLeftRadius: Radius.xl, borderTopRightRadius: Radius.xl, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl, maxHeight: '90%' },
-  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
-  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
-  modalClose: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  modalHandle: { width: moderateScale(40), height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.md },
+  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, flex: 1 },
+  modalClose: { width: moderateScale(32), height: moderateScale(32), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
 
   optionRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  optionIcon: { width: 40, height: 40, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  optionIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   optionLabel: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   optionText: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
-  checkCircle: { width: 24, height: 24, borderRadius: Radius.full, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  checkCircle: { width: moderateScale(24), height: moderateScale(24), borderRadius: Radius.full, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
 
   newAddressWrap: { marginTop: Spacing.lg },
   newAddressLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary, marginBottom: Spacing.sm },
@@ -544,7 +546,7 @@ const styles = StyleSheet.create({
 
   // Calendar
   calendarHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
-  calNav: { width: 36, height: 36, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  calNav: { width: moderateScale(36), height: moderateScale(36), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   calMonthLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
   calWeekRow: { flexDirection: 'row', marginBottom: Spacing.sm },
   calWeekDay: { flex: 1, textAlign: 'center', fontSize: FontSize.xs, fontWeight: '600', color: Colors.textMuted },
@@ -569,7 +571,7 @@ const styles = StyleSheet.create({
   // Clear cart confirm
   confirmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing.xl },
   confirmCard: { backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.xl, width: '100%', alignItems: 'center', ...Shadow.lg },
-  confirmIcon: { width: 64, height: 64, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.md },
+  confirmIcon: { width: moderateScale(64), height: moderateScale(64), borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.md },
   confirmTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.sm },
   confirmText: { fontSize: FontSize.md, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22, marginBottom: Spacing.xl },
   confirmButtons: { flexDirection: 'row', gap: Spacing.md, width: '100%' },

@@ -3,7 +3,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Clock, Home, Sparkles, Users, Calendar } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -45,6 +47,8 @@ export default function HouseScreen() {
   const { t } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState(1);
   const [extrasSel, setExtrasSel] = useState<string[]>([]);
+  const { hp } = useResponsive();
+  const heroHeight = Math.max(140, Math.min(260, hp(22)));
 
   const toggleExtra = (key: string) => {
     setExtrasSel((prev) => (prev.includes(key) ? prev.filter((e) => e !== key) : [...prev, key]));
@@ -60,7 +64,7 @@ export default function HouseScreen() {
         <View style={styles.heroWrap}>
           <Image
             source={{ uri: 'https://images.pexels.com/photos/4239031/pexels-photo-4239031.jpeg?auto=compress&cs=tinysrgb&w=600' }}
-            style={styles.heroImage}
+            style={[styles.heroImage, { height: heroHeight }]}
           />
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{t.house.heroTitle}</Text>
@@ -126,7 +130,7 @@ export default function HouseScreen() {
                 </View>
                 <Text style={styles.extraName}>{t.house.extras[extra.key]}</Text>
               </View>
-              <Text style={styles.extraPrice}>+{MXN(extra.price)}</Text>
+              <Text style={styles.extraPrice} numberOfLines={1}>+{MXN(extra.price)}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -158,9 +162,9 @@ export default function HouseScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   heroWrap: { borderRadius: Radius.xl, overflow: 'hidden', marginBottom: Spacing.xl, ...Shadow.md },
-  heroImage: { width: '100%', height: 180, resizeMode: 'cover' },
+  heroImage: { width: '100%', resizeMode: 'cover' },
   heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.lg, justifyContent: 'flex-end' },
   heroTitle: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.white },
   heroSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
@@ -169,29 +173,29 @@ const styles = StyleSheet.create({
   planCard: { borderRadius: Radius.lg, overflow: 'hidden', marginBottom: Spacing.md, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
   planCardActive: { borderColor: Colors.primary },
   planHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing.md },
-  planHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  planName: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.white },
-  popularBadge: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: Radius.full },
-  popularText: { fontSize: 10, fontWeight: '700', color: Colors.white },
+  planHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, flex: 1, marginRight: Spacing.sm },
+  planName: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.white, flexShrink: 1 },
+  popularBadge: { flexDirection: 'row', alignItems: 'center', gap: 2, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: moderateScale(6), paddingVertical: 2, borderRadius: Radius.full },
+  popularText: { fontSize: FontSize.xs - 1, fontWeight: '700', color: Colors.white },
   planPrice: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.white },
   planBody: { backgroundColor: Colors.white, padding: Spacing.md },
   planMetaRow: { flexDirection: 'row', gap: Spacing.lg, marginBottom: Spacing.md },
   planMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   planMetaText: { fontSize: FontSize.sm, color: Colors.textMuted },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: 6 },
-  featureDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.secondary },
+  featureDot: { width: moderateScale(6), height: moderateScale(6), borderRadius: moderateScale(3), backgroundColor: Colors.secondary },
   featureText: { fontSize: FontSize.sm, color: Colors.textSecondary },
-  extraCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  extraCardActive: { borderColor: Colors.secondary },
-  extraLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
+  extraCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.sm, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
+  extraCardActive: { borderColor: Colors.secondary, backgroundColor: Colors.secondary + '10' },
+  extraLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
+  checkbox: { width: moderateScale(22), height: moderateScale(22), borderRadius: moderateScale(6), borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
   checkboxActive: { backgroundColor: Colors.secondary, borderColor: Colors.secondary },
-  checkText: { color: Colors.white, fontWeight: '700', fontSize: 14 },
-  extraName: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
-  extraPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.secondary },
+  checkText: { color: Colors.white, fontWeight: '700', fontSize: FontSize.sm - 1 },
+  extraName: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary, flex: 1, flexShrink: 1 },
+  extraPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.secondary, flexShrink: 0 },
   summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm },
+  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary, flex: 1 },
   summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },
   totalLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },

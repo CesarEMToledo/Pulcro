@@ -24,6 +24,12 @@ const es = {
     searchPlaceholder: '¿Qué servicio necesitas hoy?',
     heroSubtitle: 'Limpieza a domicilio, simple y rápido',
     heroBadge: 'Recogemos y entregamos',
+    heroOffers: {
+      laundry: { title: 'Ropa por Kilos', subtitle: '20% de descuento en tu primer pedido', badge: 'Oferta por tiempo limitado' },
+      garments: { title: 'Limpieza de Tenis', subtitle: 'Dales una segunda vida a tus tenis favoritos', badge: 'Recogemos y entregamos' },
+      house: { title: 'Limpieza de Casa', subtitle: '15% de descuento antes de fin de mes', badge: 'Cupos limitados' },
+      car: { title: 'Limpieza de Auto', subtitle: 'Doble limpieza, mismo precio de siempre', badge: 'Solo esta semana' },
+    },
     servicesTitle: 'Servicios',
     servicesSubtitle: 'Elige la categoría que necesitas',
     popularTitle: 'Populares',
@@ -54,6 +60,22 @@ const es = {
       laundryByKilos: 'Lavado de Ropa por Kilos',
       sneakersCleaning: 'Limpieza de Tenis',
       houseCleaning: 'Limpieza de Casa',
+    },
+  },
+  notifications: {
+    title: 'Notificaciones',
+    markAllRead: 'Marcar todo como leído',
+    emptyTitle: 'No tienes notificaciones',
+    emptySubtitle: 'Aquí verás las actualizaciones de tus pedidos.',
+    statusMessages: {
+      pickedUp: 'Tu pedido fue recogido y va en camino a nuestras instalaciones.',
+      inProgress: 'Estamos trabajando en tu pedido.',
+      onTheWay: 'Tu pedido va en camino a tu domicilio.',
+      delivered: 'Tu pedido fue entregado. ¡Gracias por tu preferencia!',
+    },
+    promo: {
+      title: 'Oferta especial para ti',
+      message: '20% de descuento en tu próximo lavado de ropa por kilos.',
     },
   },
   shop: {
@@ -108,6 +130,15 @@ const es = {
       last4Placeholder: 'Últimos 4 dígitos',
       addButton: 'Agregar tarjeta',
       cashInStore: 'Pago en efectivo en tienda',
+    },
+    editModal: {
+      title: 'Editar perfil',
+      changePhoto: 'Cambiar foto',
+      removePhoto: 'Quitar foto',
+      nameLabel: 'Nombre',
+      namePlaceholder: 'Tu nombre',
+      saveButton: 'Guardar cambios',
+      permissionDenied: 'Necesitamos acceso a tus fotos para cambiar tu foto de perfil.',
     },
   },
   laundry: {
@@ -271,6 +302,12 @@ const en: typeof es = {
     searchPlaceholder: 'What service do you need today?',
     heroSubtitle: 'Home cleaning, simple and fast',
     heroBadge: 'We pick up and deliver',
+    heroOffers: {
+      laundry: { title: 'Laundry by Kilo', subtitle: '20% off your first order', badge: 'Limited time offer' },
+      garments: { title: 'Sneaker Cleaning', subtitle: 'Give your favorite sneakers a second life', badge: 'We pick up and deliver' },
+      house: { title: 'House Cleaning', subtitle: '15% off before the month ends', badge: 'Limited spots' },
+      car: { title: 'Car Cleaning', subtitle: 'Double the clean, same price as always', badge: 'This week only' },
+    },
     servicesTitle: 'Services',
     servicesSubtitle: 'Choose the category you need',
     popularTitle: 'Popular',
@@ -301,6 +338,22 @@ const en: typeof es = {
       laundryByKilos: 'Laundry Wash by Kilo',
       sneakersCleaning: 'Sneaker Cleaning',
       houseCleaning: 'House Cleaning',
+    },
+  },
+  notifications: {
+    title: 'Notifications',
+    markAllRead: 'Mark all as read',
+    emptyTitle: "You don't have any notifications",
+    emptySubtitle: "You'll see your order updates here.",
+    statusMessages: {
+      pickedUp: 'Your order was picked up and is on its way to our facility.',
+      inProgress: "We're working on your order.",
+      onTheWay: 'Your order is on its way to you.',
+      delivered: 'Your order was delivered. Thanks for choosing us!',
+    },
+    promo: {
+      title: 'Special offer for you',
+      message: '20% off your next laundry by kilo wash.',
     },
   },
   shop: {
@@ -355,6 +408,15 @@ const en: typeof es = {
       last4Placeholder: 'Last 4 digits',
       addButton: 'Add card',
       cashInStore: 'Cash payment in store',
+    },
+    editModal: {
+      title: 'Edit profile',
+      changePhoto: 'Change photo',
+      removePhoto: 'Remove photo',
+      nameLabel: 'Name',
+      namePlaceholder: 'Your name',
+      saveButton: 'Save changes',
+      permissionDenied: 'We need access to your photos to change your profile picture.',
     },
   },
   laundry: {

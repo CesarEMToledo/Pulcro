@@ -27,6 +27,7 @@ function RootNavigator() {
         <Stack.Screen name="house" />
         <Stack.Screen name="car" />
         <Stack.Screen name="cart" />
+        <Stack.Screen name="notifications" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />

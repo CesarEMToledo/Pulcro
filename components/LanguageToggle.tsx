@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Globe } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -18,7 +19,7 @@ export default function LanguageToggle({ variant = 'chip' }: Props) {
           <View style={[styles.rowIcon, { backgroundColor: Colors.secondary + '15' }]}>
             <Globe size={20} color={Colors.secondary} strokeWidth={2.5} />
           </View>
-          <Text style={styles.rowLabel}>{language === 'es' ? 'Idioma' : 'Language'}</Text>
+          <Text style={styles.rowLabel} numberOfLines={1}>{language === 'es' ? 'Idioma' : 'Language'}</Text>
         </View>
         <View style={styles.valuePill}>
           <Text style={styles.valuePillText}>{language.toUpperCase()}</Text>
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    height: 44,
+    height: moderateScale(44),
     paddingHorizontal: Spacing.md,
     borderRadius: Radius.full,
     backgroundColor: Colors.surface,
@@ -64,10 +65,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
+    flex: 1,
+    marginRight: Spacing.sm,
   },
   rowIcon: {
-    width: 40,
-    height: 40,
+    width: moderateScale(40),
+    height: moderateScale(40),
     borderRadius: Radius.md,
     justifyContent: 'center',
     alignItems: 'center',
@@ -76,6 +79,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     fontWeight: '500',
     color: Colors.textPrimary,
+    flexShrink: 1,
   },
   valuePill: {
     paddingHorizontal: Spacing.sm,

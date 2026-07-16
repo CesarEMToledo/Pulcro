@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -116,29 +117,29 @@ export default function OrdersScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   activeCard: { backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.lg, marginBottom: Spacing.xl, ...Shadow.md },
   activeHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.lg },
-  activeIconWrap: { width: 48, height: 48, borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  activeIconWrap: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
   activeTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
   activeId: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   statusPill: { paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.full },
   statusText: { fontSize: FontSize.xs, fontWeight: '700' },
   stepsRow: { flexDirection: 'row', justifyContent: 'space-between', position: 'relative' },
   stepWrap: { alignItems: 'center', flex: 1, position: 'relative' },
-  stepCircle: { width: 36, height: 36, borderRadius: Radius.full, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
+  stepCircle: { width: moderateScale(36), height: moderateScale(36), borderRadius: Radius.full, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
   stepActive: { backgroundColor: Colors.primary },
   stepInactive: { backgroundColor: Colors.surface },
-  stepLabel: { fontSize: 10, fontWeight: '600', textAlign: 'center' },
+  stepLabel: { fontSize: FontSize.xs - 1, fontWeight: '600', textAlign: 'center' },
   stepLine: { position: 'absolute', top: 18, left: '70%', right: '-30%', height: 2, zIndex: -1 },
   historyTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
   orderCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, ...Shadow.sm },
   orderLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
-  orderIcon: { width: 44, height: 44, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  orderIcon: { width: moderateScale(44), height: moderateScale(44), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   orderService: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   orderMeta: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 2, marginBottom: 6 },
   statusPillSmall: { alignSelf: 'flex-start', paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: Radius.full },
-  statusTextSmall: { fontSize: 10, fontWeight: '700' },
+  statusTextSmall: { fontSize: FontSize.xs - 1, fontWeight: '700' },
   orderRight: { alignItems: 'flex-end', gap: Spacing.xs },
   orderTotal: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.primary },
 });
