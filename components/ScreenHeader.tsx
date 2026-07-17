@@ -2,32 +2,47 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, Spacing, FontSize, Radius } from '@/constants/theme';
 import { ChevronLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Props {
   title: string;
   showBack?: boolean;
   rightIcon?: React.ReactNode;
   onRightPress?: () => void;
+  rightAccessibilityLabel?: string;
 }
 
-export default function ScreenHeader({ title, showBack = true, rightIcon, onRightPress }: Props) {
+export default function ScreenHeader({ title, showBack = true, rightIcon, onRightPress, rightAccessibilityLabel }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
   return (
     <View style={styles.container}>
       {showBack ? (
-        <TouchableOpacity activeOpacity={0.7} onPress={() => router.back()} style={styles.iconButton}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => router.back()}
+          style={styles.iconButton}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.back}
+        >
           <ChevronLeft size={24} color={Colors.textPrimary} strokeWidth={2.5} />
         </TouchableOpacity>
       ) : (
-        <View style={styles.iconButton} />
+        <View style={styles.iconSpacer} />
       )}
       <Text style={styles.title}>{title}</Text>
       {rightIcon ? (
-        <TouchableOpacity activeOpacity={0.7} onPress={onRightPress} style={styles.iconButton}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onRightPress}
+          style={styles.iconButton}
+          accessibilityRole="button"
+          accessibilityLabel={rightAccessibilityLabel}
+        >
           {rightIcon}
         </TouchableOpacity>
       ) : (
-        <View style={styles.iconButton} />
+        <View style={styles.iconSpacer} />
       )}
     </View>
   );
@@ -56,5 +71,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  iconSpacer: {
+    width: 40,
+    height: 40,
   },
 });

@@ -54,6 +54,7 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setPermissionDenied(true);
+        await reverseGeocode(region);
         setLoading(false);
         setLocating(false);
         return;
@@ -83,6 +84,8 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
       if (geocodeTimeout.current) clearTimeout(geocodeTimeout.current);
     };
   }, []);
+
+  const hasValidAddress = address.trim().length > 0 && address !== t.location.locatingError;
 
   const handleRegionChangeComplete = (nextRegion: Region) => {
     setRegion(nextRegion);
@@ -149,8 +152,8 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
 
           <PrimaryButton
             label={t.location.confirmButton}
-            onPress={() => onConfirm(address || t.location.locatingError)}
-            disabled={loading}
+            onPress={() => onConfirm(address)}
+            disabled={loading || !hasValidAddress}
             style={{ marginTop: Spacing.md }}
           />
         </View>

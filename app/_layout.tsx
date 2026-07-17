@@ -1,17 +1,26 @@
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { LocationProvider, useLocation } from '@/contexts/LocationContext';
-import { Colors } from '@/constants/theme';
+import { CartProvider } from '@/contexts/CartContext';
 import LocationConfirmScreen from '@/components/LocationConfirmScreen';
+import LoadingScreen from '@/components/LoadingScreen';
+
+const MIN_LOADING_TIME = 1800;
 
 function RootNavigator() {
   const { isReady, address, confirmLocation } = useLocation();
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
-  if (!isReady) {
-    return <View style={{ flex: 1, backgroundColor: Colors.background }} />;
+  useEffect(() => {
+    const timer = setTimeout(() => setMinTimeElapsed(true), MIN_LOADING_TIME);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isReady || !minTimeElapsed) {
+    return <LoadingScreen />;
   }
 
   if (!address) {
@@ -26,6 +35,9 @@ function RootNavigator() {
         <Stack.Screen name="garments" />
         <Stack.Screen name="house" />
         <Stack.Screen name="car" />
+        <Stack.Screen name="plumbing" />
+        <Stack.Screen name="gardening" />
+        <Stack.Screen name="electricity" />
         <Stack.Screen name="cart" />
         <Stack.Screen name="+not-found" />
       </Stack>
@@ -40,7 +52,9 @@ export default function RootLayout() {
   return (
     <LanguageProvider>
       <LocationProvider>
-        <RootNavigator />
+        <CartProvider>
+          <RootNavigator />
+        </CartProvider>
       </LocationProvider>
     </LanguageProvider>
   );

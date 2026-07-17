@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const STORAGE_KEY = '@pulcro/confirmed_address';
+const STORAGE_KEY = '@cleano/confirmed_address';
 
 interface LocationContextValue {
   address: string | null;

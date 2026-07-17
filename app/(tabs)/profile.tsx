@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Modal,
   TextInput,
   KeyboardAvoidingView,
@@ -18,17 +17,17 @@ import {
   MapPin,
   CreditCard,
   HelpCircle,
-  LogOut,
   Bell,
   Shield,
   Heart,
   X,
-  Check,
   Plus,
   Trash2,
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import LanguageToggle from '@/components/LanguageToggle';
+import InfoModal from '@/components/InfoModal';
+import FallbackImage from '@/components/FallbackImage';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type Address = { id: string; label: string; text: string };
@@ -38,6 +37,10 @@ export default function ProfileScreen() {
   const { t } = useLanguage();
   const [showAddresses, setShowAddresses] = useState(false);
   const [showPayments, setShowPayments] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const INITIAL_ADDRESSES: Address[] = [
     { id: 'a1', label: t.profile.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
@@ -80,10 +83,10 @@ export default function ProfileScreen() {
   const menuItems = [
     { icon: MapPin, label: t.profile.menu.addresses, color: Colors.primary, action: () => setShowAddresses(true) },
     { icon: CreditCard, label: t.profile.menu.payments, color: Colors.secondary, action: () => setShowPayments(true) },
-    { icon: Bell, label: t.profile.menu.notifications, color: Colors.warning, action: () => {} },
-    { icon: Heart, label: t.profile.menu.favorites, color: Colors.error, action: () => {} },
-    { icon: Shield, label: t.profile.menu.privacy, color: Colors.primary, action: () => {} },
-    { icon: HelpCircle, label: t.profile.menu.help, color: Colors.secondary, action: () => {} },
+    { icon: Bell, label: t.profile.menu.notifications, color: Colors.warning, action: () => setShowNotifications(true) },
+    { icon: Heart, label: t.profile.menu.favorites, color: Colors.error, action: () => setShowFavorites(true) },
+    { icon: Shield, label: t.profile.menu.privacy, color: Colors.primary, action: () => setShowPrivacy(true) },
+    { icon: HelpCircle, label: t.profile.menu.help, color: Colors.secondary, action: () => setShowHelp(true) },
   ];
 
   return (
@@ -92,7 +95,7 @@ export default function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileCard}>
           <View style={styles.avatarWrap}>
-            <Image
+            <FallbackImage
               source={{ uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200' }}
               style={styles.avatar}
             />
@@ -143,11 +146,6 @@ export default function ProfileScreen() {
           })}
         </View>
 
-        <TouchableOpacity activeOpacity={0.7} onPress={() => {}} style={styles.logoutButton}>
-          <LogOut size={20} color={Colors.error} strokeWidth={2.5} />
-          <Text style={styles.logoutText}>{t.profile.logout}</Text>
-        </TouchableOpacity>
-
         <Text style={styles.version}>{t.profile.version}</Text>
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
@@ -159,7 +157,12 @@ export default function ProfileScreen() {
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t.profile.addressesModal.title}</Text>
-              <TouchableOpacity onPress={() => setShowAddresses(false)} style={styles.modalClose}>
+              <TouchableOpacity
+                onPress={() => setShowAddresses(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -174,7 +177,12 @@ export default function ProfileScreen() {
                     <Text style={styles.optionLabel}>{addr.label}</Text>
                     <Text style={styles.optionText}>{addr.text}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => removeAddress(addr.id)} style={styles.trashBtn}>
+                  <TouchableOpacity
+                    onPress={() => removeAddress(addr.id)}
+                    style={styles.trashBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel={t.common.removeItem}
+                  >
                     <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
                   </TouchableOpacity>
                 </View>
@@ -220,7 +228,12 @@ export default function ProfileScreen() {
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t.profile.paymentsModal.title}</Text>
-              <TouchableOpacity onPress={() => setShowPayments(false)} style={styles.modalClose}>
+              <TouchableOpacity
+                onPress={() => setShowPayments(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -239,7 +252,12 @@ export default function ProfileScreen() {
                       <Text style={styles.optionText}>{t.profile.paymentsModal.cashInStore}</Text>
                     )}
                   </View>
-                  <TouchableOpacity onPress={() => removePayment(pm.id)} style={styles.trashBtn}>
+                  <TouchableOpacity
+                    onPress={() => removePayment(pm.id)}
+                    style={styles.trashBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel={t.common.removeItem}
+                  >
                     <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
                   </TouchableOpacity>
                 </View>
@@ -279,6 +297,55 @@ export default function ProfileScreen() {
           </KeyboardAvoidingView>
         </View>
       </Modal>
+
+      <InfoModal
+        visible={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        title={t.profile.notificationsModal.title}
+        message={t.profile.notificationsModal.empty}
+        icon={Bell}
+      />
+
+      <InfoModal
+        visible={showFavorites}
+        onClose={() => setShowFavorites(false)}
+        title={t.profile.favoritesModal.title}
+        message={t.profile.favoritesModal.empty}
+        icon={Heart}
+      />
+
+      <InfoModal
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t.profile.helpModal.title}
+        message={t.profile.helpModal.message}
+        icon={HelpCircle}
+      />
+
+      {/* Privacy Modal */}
+      <Modal visible={showPrivacy} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t.profile.privacyModal.title}</Text>
+              <TouchableOpacity
+                onPress={() => setShowPrivacy(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ maxHeight: 340 }}>
+              {t.profile.privacyModal.content.map((paragraph, i) => (
+                <Text key={i} style={styles.privacyParagraph}>{paragraph}</Text>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -303,9 +370,7 @@ const styles = StyleSheet.create({
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md + 2, borderBottomWidth: 1, borderBottomColor: Colors.border },
   menuIcon: { width: 40, height: 40, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   menuLabel: { flex: 1, fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
-  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: Colors.error + '10', borderRadius: Radius.lg, paddingVertical: Spacing.md, marginBottom: Spacing.md },
-  logoutText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.error },
-  version: { textAlign: 'center', fontSize: FontSize.xs, color: Colors.textMuted },
+  version: { textAlign: 'center', fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.md },
 
   // Modals
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
@@ -327,4 +392,5 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1.5, borderColor: Colors.border, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, fontSize: FontSize.md, color: Colors.textPrimary, marginBottom: Spacing.sm, backgroundColor: Colors.white },
   addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, backgroundColor: Colors.primary, borderRadius: Radius.lg, paddingVertical: Spacing.md },
   addBtnText: { fontSize: FontSize.md, fontWeight: '700', color: Colors.white },
+  privacyParagraph: { fontSize: FontSize.md, color: Colors.textSecondary, lineHeight: 22, marginBottom: Spacing.md },
 });

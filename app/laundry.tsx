@@ -1,13 +1,17 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Minus, Plus, Truck, Shield, Leaf } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import ServiceHero from '@/components/ServiceHero';
+import BookingSummaryCard from '@/components/BookingSummaryCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
+import { ServiceIcons } from '@/constants/serviceIcons';
+import { bookingScreenStyles as bs } from '@/constants/bookingScreenStyles';
 
 const MXN = (n: number) => `$${n.toLocaleString('es-MX')} MXN`;
 
@@ -26,10 +30,25 @@ function tierForKilos(k: number): number {
 export default function LaundryScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [kilos, setKilos] = useState(5);
 
   const selectedTier = tierForKilos(kilos);
   const total = kilos * tiers[selectedTier].price;
+
+  const addToCart = () => {
+    addItem(
+      {
+        id: 'laundry-booking',
+        name: t.laundry.title,
+        detail: `${kilos} ${t.laundry.kg} · ${tiers[selectedTier].kg}`,
+        price: total,
+        image: ServiceIcons.laundry,
+      },
+      { replace: true }
+    );
+    router.push('/cart');
+  };
 
   const decrease = () => {
     const next = Math.max(1, kilos - 1);
@@ -43,19 +62,15 @@ export default function LaundryScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.laundry.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.heroWrap}>
-          <Image
-            source={{ uri: 'https://images.pexels.com/photos/7989576/pexels-photo-7989576.jpeg?auto=compress&cs=tinysrgb&w=600' }}
-            style={styles.heroImage}
-          />
-          <LinearGradient colors={['transparent', 'rgba(0,0,0,0.6)']} style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>{t.laundry.heroTitle}</Text>
-            <Text style={styles.heroSubtitle}>{t.laundry.heroSubtitle}</Text>
-          </LinearGradient>
-        </View>
+        <ServiceHero
+          variant="laundry"
+          gradient={['#1A6FD4', '#4A90E2']}
+          title={t.laundry.heroTitle}
+          subtitle={t.laundry.heroSubtitle}
+        />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.laundry.howMuch}</Text>
+        <View style={bs.section}>
+          <Text style={bs.sectionTitle}>{t.laundry.howMuch}</Text>
           <View style={styles.stepperCard}>
             <TouchableOpacity activeOpacity={0.7} onPress={decrease} style={styles.stepperBtn}>
               <Minus size={24} color={Colors.primary} strokeWidth={2.5} />
@@ -70,8 +85,8 @@ export default function LaundryScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.laundry.planApplied}</Text>
+        <View style={bs.section}>
+          <Text style={bs.sectionTitle}>{t.laundry.planApplied}</Text>
           {tiers.map((tier, i) => {
             const active = selectedTier === i;
             return (
@@ -122,23 +137,16 @@ export default function LaundryScreen() {
           </View>
         </View>
 
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>{kilos} kg × ${tiers[selectedTier].price} MXN</Text>
-            <Text style={styles.summaryValue}>{MXN(total)}</Text>
-          </View>
-          <View style={[styles.summaryRow, { marginTop: Spacing.sm }]}>
-            <Text style={styles.summaryLabel}>{t.common.shipping}</Text>
-            <Text style={styles.summaryValueFree}>{t.common.free}</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>{t.common.total}</Text>
-            <Text style={styles.totalValue}>{MXN(total)}</Text>
-          </View>
-        </View>
+        <BookingSummaryCard
+          rows={[
+            { label: `${kilos} kg × $${tiers[selectedTier].price} MXN`, value: MXN(total) },
+            { label: t.common.shipping, value: t.common.free, valueStyle: { color: Colors.success, fontWeight: '700' } },
+          ]}
+          totalLabel={t.common.total}
+          totalValue={MXN(total)}
+        />
 
-        <PrimaryButton label={t.laundry.scheduleButton} onPress={() => router.push('/cart')} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.laundry.scheduleButton} onPress={addToCart} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>
@@ -148,13 +156,6 @@ export default function LaundryScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
-  heroWrap: { borderRadius: Radius.xl, overflow: 'hidden', marginBottom: Spacing.xl, ...Shadow.md },
-  heroImage: { width: '100%', height: 180, resizeMode: 'cover' },
-  heroOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.lg, justifyContent: 'flex-end' },
-  heroTitle: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.white },
-  heroSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
-  section: { marginBottom: Spacing.xl },
-  sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.md },
   stepperCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
   stepperBtn: { width: 48, height: 48, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   stepperValue: { alignItems: 'center' },
@@ -176,12 +177,4 @@ const styles = StyleSheet.create({
   featureItem: { alignItems: 'center', flex: 1 },
   featureIcon: { width: 48, height: 48, borderRadius: Radius.md, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
   featureText: { fontSize: FontSize.xs, fontWeight: '500', color: Colors.textSecondary, textAlign: 'center' },
-  summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  summaryLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
-  summaryValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
-  summaryValueFree: { fontSize: FontSize.md, fontWeight: '700', color: Colors.success },
-  divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.md },
-  totalLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
-  totalValue: { fontSize: FontSize.xxl, fontWeight: '800', color: Colors.primary },
 });

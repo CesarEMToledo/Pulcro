@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
-import { Car, Sparkles, Droplets, Wind } from 'lucide-react-native';
+import { Plug, Lightbulb, Gauge, PlugZap, Sparkles } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
@@ -18,53 +18,58 @@ import { bookingScreenStyles as bs } from '@/constants/bookingScreenStyles';
 
 const servicesData = [
   {
-    key: 'exterior' as const,
-    price: 120,
+    key: 'outlet' as const,
+    price: 200,
     duration: '45 min',
-    icon: Droplets,
+    icon: Plug,
     color: ['#1A6FD4', '#4A90E2'] as [string, string],
   },
   {
-    key: 'full' as const,
-    price: 250,
+    key: 'lighting' as const,
+    price: 320,
     duration: '1.5 hrs',
-    icon: Car,
+    icon: Lightbulb,
     color: ['#2ABFBF', '#00D4AA'] as [string, string],
     popular: true,
   },
   {
-    key: 'premium' as const,
-    price: 600,
-    duration: '4 hrs',
-    icon: Sparkles,
+    key: 'panel' as const,
+    price: 450,
+    duration: '2 hrs',
+    icon: Gauge,
     color: ['#0D4FA0', '#1A6FD4'] as [string, string],
+  },
+  {
+    key: 'rewiring' as const,
+    price: 1500,
+    duration: '6 hrs',
+    icon: PlugZap,
+    color: ['#1A9A9A', '#4DD9D9'] as [string, string],
   },
 ];
 
-const vehicleTypesData = [
-  { key: 'sedan' as const, extra: 0 },
-  { key: 'suv' as const, extra: 50 },
-  { key: 'pickup' as const, extra: 80 },
-  { key: 'van' as const, extra: 100 },
+const propertyTypeData = [
+  { key: 'apartment' as const, extra: 0 },
+  { key: 'house' as const, extra: 100 },
 ];
 
-export default function CarScreen() {
+export default function ElectricityScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { addItem } = useCart();
   const [selectedService, setSelectedService] = useState(1);
-  const [selectedVehicle, setSelectedVehicle] = useState(0);
+  const [selectedProperty, setSelectedProperty] = useState(0);
 
-  const total = servicesData[selectedService].price + vehicleTypesData[selectedVehicle].extra;
+  const total = servicesData[selectedService].price + propertyTypeData[selectedProperty].extra;
 
   const addToCart = () => {
     addItem(
       {
-        id: 'car-booking',
-        name: `${t.car.title} · ${t.car.services[servicesData[selectedService].key].name}`,
-        detail: t.car.vehicles[vehicleTypesData[selectedVehicle].key],
+        id: 'electricity-booking',
+        name: `${t.electricity.title} · ${t.electricity.services[servicesData[selectedService].key].name}`,
+        detail: t.electricity.property[propertyTypeData[selectedProperty].key],
         price: total,
-        image: ServiceIcons.car,
+        image: ServiceIcons.electricity,
       },
       { replace: true }
     );
@@ -73,34 +78,34 @@ export default function CarScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title={t.car.title} />
+      <ScreenHeader title={t.electricity.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <ServiceHero
-          variant="car"
-          gradient={['#0D4FA0', '#1A6FD4']}
-          title={t.car.heroTitle}
-          subtitle={t.car.heroSubtitle}
+          variant="electricity"
+          gradient={['#1A6FD4', '#4DD9D9']}
+          title={t.electricity.heroTitle}
+          subtitle={t.electricity.heroSubtitle}
         />
 
         <View style={bs.section}>
-          <Text style={bs.sectionTitle}>{t.car.vehicleType}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.vehicleScroll}>
-            {vehicleTypesData.map((v, i) => (
+          <Text style={bs.sectionTitle}>{t.electricity.propertyType}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.propertyScroll}>
+            {propertyTypeData.map((p, i) => (
               <TouchableOpacity
-                key={v.key}
+                key={p.key}
                 activeOpacity={0.7}
-                onPress={() => setSelectedVehicle(i)}
-                style={[styles.vehicleChip, selectedVehicle === i && styles.vehicleChipActive]}
+                onPress={() => setSelectedProperty(i)}
+                style={[styles.propertyChip, selectedProperty === i && styles.propertyChipActive]}
               >
-                <Text style={[styles.vehicleText, selectedVehicle === i && styles.vehicleTextActive]}>{t.car.vehicles[v.key]}</Text>
-                {v.extra > 0 && <Text style={[styles.vehicleExtra, selectedVehicle === i && styles.vehicleExtraActive]}>+{MXN(v.extra)}</Text>}
+                <Text style={[styles.propertyText, selectedProperty === i && styles.propertyTextActive]}>{t.electricity.property[p.key]}</Text>
+                {p.extra > 0 && <Text style={[styles.propertyExtra, selectedProperty === i && styles.propertyExtraActive]}>+{MXN(p.extra)}</Text>}
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
         <View style={bs.section}>
-          <Text style={bs.sectionTitle}>{t.car.chooseService}</Text>
+          <Text style={bs.sectionTitle}>{t.electricity.chooseService}</Text>
           {servicesData.map((svc, i) => {
             const Icon = svc.icon;
             return (
@@ -116,7 +121,7 @@ export default function CarScreen() {
                   </LinearGradient>
                   <View style={{ flex: 1 }}>
                     <View style={styles.svcTitleRow}>
-                      <Text style={styles.svcName}>{t.car.services[svc.key].name}</Text>
+                      <Text style={styles.svcName}>{t.electricity.services[svc.key].name}</Text>
                       {svc.popular && (
                         <View style={bs.popularBadgeOnCard}>
                           <Sparkles size={10} color={Colors.white} strokeWidth={2.5} />
@@ -130,7 +135,7 @@ export default function CarScreen() {
                 </View>
                 {selectedService === i && (
                   <View style={styles.svcFeatures}>
-                    {t.car.services[svc.key].features.map((feat) => (
+                    {t.electricity.services[svc.key].features.map((feat) => (
                       <View key={feat} style={bs.featureRow}>
                         <View style={bs.featureDot} />
                         <Text style={bs.featureText}>{feat}</Text>
@@ -146,18 +151,18 @@ export default function CarScreen() {
         <BookingSummaryCard
           rows={[
             {
-              label: `${t.car.services[servicesData[selectedService].key].name} · ${t.car.vehicles[vehicleTypesData[selectedVehicle].key]}`,
+              label: `${t.electricity.services[servicesData[selectedService].key].name} · ${t.electricity.property[propertyTypeData[selectedProperty].key]}`,
               value: MXN(servicesData[selectedService].price),
             },
-            ...(vehicleTypesData[selectedVehicle].extra > 0
-              ? [{ label: t.car.vehicleSurcharge, value: `+${MXN(vehicleTypesData[selectedVehicle].extra)}` }]
+            ...(propertyTypeData[selectedProperty].extra > 0
+              ? [{ label: t.electricity.propertySurcharge, value: `+${MXN(propertyTypeData[selectedProperty].extra)}` }]
               : []),
           ]}
           totalLabel={t.common.total}
           totalValue={MXN(total)}
         />
 
-        <PrimaryButton label={t.car.scheduleButton} onPress={addToCart} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.electricity.scheduleButton} onPress={addToCart} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>
@@ -167,13 +172,13 @@ export default function CarScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
-  vehicleScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
-  vehicleChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.white, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, borderRadius: Radius.lg, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  vehicleChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
-  vehicleText: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
-  vehicleTextActive: { color: Colors.primary },
-  vehicleExtra: { fontSize: FontSize.xs, color: Colors.textMuted },
-  vehicleExtraActive: { color: Colors.primary },
+  propertyScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
+  propertyChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.white, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, borderRadius: Radius.lg, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
+  propertyChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
+  propertyText: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  propertyTextActive: { color: Colors.primary },
+  propertyExtra: { fontSize: FontSize.xs, color: Colors.textMuted },
+  propertyExtraActive: { color: Colors.primary },
   svcCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
   svcCardActive: { borderColor: Colors.primary },
   svcHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },

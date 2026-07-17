@@ -11,6 +11,14 @@ const es = {
     confirm: 'Confirmar',
     add: 'Agregar',
     popular: 'Popular',
+    close: 'Cerrar',
+    back: 'Regresar',
+    clearSearch: 'Limpiar búsqueda',
+    removeItem: 'Eliminar artículo',
+    decreaseQuantity: 'Disminuir cantidad',
+    increaseQuantity: 'Aumentar cantidad',
+    previousMonth: 'Mes anterior',
+    nextMonth: 'Mes siguiente',
   },
   tabs: {
     home: 'Inicio',
@@ -24,8 +32,19 @@ const es = {
     searchPlaceholder: '¿Qué servicio necesitas hoy?',
     heroSubtitle: 'Limpieza a domicilio, simple y rápido',
     heroBadge: 'Recogemos y entregamos',
+    promo: {
+      badge: 'Oferta de la semana',
+      title: '20% de descuento en limpieza de casa',
+      description: 'Válido esta semana en tu primer servicio de limpieza profunda.',
+      cta: 'Aprovechar',
+    },
     servicesTitle: 'Servicios',
     servicesSubtitle: 'Elige la categoría que necesitas',
+    searchNoResults: 'No encontramos servicios con ese nombre',
+    notifications: {
+      title: 'Notificaciones',
+      empty: 'No tienes notificaciones nuevas',
+    },
     popularTitle: 'Populares',
     viewAll: 'Ver todo',
     categories: {
@@ -33,6 +52,9 @@ const es = {
       garments: { title: 'Limpieza de Prendas', description: 'Sombreros, tenis, cinturones, zapatos, botas y gorras.' },
       house: { title: 'Limpieza de Casas', description: 'Profesionales a tu hogar. Limpieza profunda y regular.' },
       car: { title: 'Limpieza de Carros', description: 'Detallado interior y exterior a domicilio.' },
+      plumbing: { title: 'Plomería', description: 'Reparación de fugas, instalación de tuberías y más, a domicilio.' },
+      gardening: { title: 'Jardinería', description: 'Mantenimiento y diseño de jardines por profesionales.' },
+      electricity: { title: 'Electricidad', description: 'Instalaciones y reparaciones eléctricas seguras y rápidas.' },
     },
     popularServices: {
       sneakers: 'Lavado de Tenis',
@@ -55,6 +77,13 @@ const es = {
       sneakersCleaning: 'Limpieza de Tenis',
       houseCleaning: 'Limpieza de Casa',
     },
+    detailModal: {
+      title: 'Detalle del pedido',
+      orderId: 'Número de pedido',
+      date: 'Fecha',
+      status: 'Estado',
+      items: 'Artículos',
+    },
   },
   shop: {
     title: 'Tienda',
@@ -67,7 +96,7 @@ const es = {
       eco: 'Eco',
     },
     products: {
-      detergentPro: 'Detergente Pulcro Pro',
+      detergentPro: 'Detergente Cleano Pro',
       disinfectant: 'Desinfectante Multiusos',
       sponges: 'Esponjas Premium (3pz)',
       ecoCleaner: 'Limpiador Ecológico Bio',
@@ -89,8 +118,7 @@ const es = {
       privacy: 'Privacidad y seguridad',
       help: 'Ayuda y soporte',
     },
-    logout: 'Cerrar sesión',
-    version: 'PULCRO v1.0.0',
+    version: 'CLEANO v1.0.0',
     addressLabels: { home: 'Casa', work: 'Trabajo', other: 'Otro', new: 'Nueva' },
     addressesModal: {
       title: 'Mis direcciones',
@@ -108,6 +136,27 @@ const es = {
       last4Placeholder: 'Últimos 4 dígitos',
       addButton: 'Agregar tarjeta',
       cashInStore: 'Pago en efectivo en tienda',
+    },
+    notificationsModal: {
+      title: 'Notificaciones',
+      empty: 'No tienes notificaciones nuevas',
+    },
+    favoritesModal: {
+      title: 'Favoritos',
+      empty: 'Aún no tienes servicios o productos favoritos',
+    },
+    helpModal: {
+      title: 'Ayuda y soporte',
+      message: '¿Necesitas ayuda? Escríbenos a soporte@cleano.app y te responderemos lo antes posible.',
+    },
+    privacyModal: {
+      title: 'Privacidad y seguridad',
+      content: [
+        'En Cleano recopilamos tu ubicación únicamente para confirmar la dirección de recogida y entrega de tus pedidos.',
+        'No compartimos tu información con terceros, salvo lo necesario para completar el servicio que solicitaste.',
+        'No usamos tu ubicación ni tus datos para publicidad ni con fines de rastreo.',
+        'Puedes solicitar la eliminación de tus datos escribiendo a soporte@cleano.app.',
+      ],
     },
   },
   laundry: {
@@ -199,17 +248,101 @@ const es = {
     vehicleSurcharge: 'Cargo por vehículo',
     scheduleButton: 'Agendar lavado',
   },
+  plumbing: {
+    title: 'Plomería',
+    heroTitle: 'Plomería a domicilio',
+    heroSubtitle: 'Técnicos certificados, llegan hasta ti',
+    urgencyType: 'Nivel de urgencia',
+    urgency: { normal: 'Normal', urgent: 'Urgente' },
+    chooseService: 'Elige el servicio',
+    services: {
+      unclog: {
+        name: 'Destape de drenaje',
+        features: ['Diagnóstico del problema', 'Destape con equipo profesional', 'Limpieza del área de trabajo', 'Garantía de servicio'],
+      },
+      leak: {
+        name: 'Reparación de fuga',
+        features: ['Localización de la fuga', 'Reparación o cambio de piezas', 'Prueba de presión', 'Garantía de 30 días'],
+      },
+      faucet: {
+        name: 'Instalación de llave',
+        features: ['Retiro de llave anterior', 'Instalación de llave nueva', 'Prueba de fugas', 'Limpieza final'],
+      },
+      heater: {
+        name: 'Calentador de agua',
+        features: ['Revisión de instalación actual', 'Instalación o reparación', 'Prueba de funcionamiento', 'Garantía de 90 días'],
+      },
+    },
+    urgencySurcharge: 'Cargo por urgencia',
+    scheduleButton: 'Agendar servicio',
+  },
+  gardening: {
+    title: 'Jardinería',
+    heroTitle: 'Cuidado de jardines',
+    heroSubtitle: 'Jardineros profesionales a tu hogar',
+    choosePlan: 'Elige tu plan',
+    plans: {
+      basic: {
+        name: 'Básico',
+        rooms: 'Jardín pequeño',
+        features: ['Corte de césped', 'Recorte de bordes', 'Recolección de residuos', 'Riego de plantas'],
+      },
+      standard: {
+        name: 'Estándar',
+        rooms: 'Jardín mediano',
+        features: ['Todo lo del Básico', 'Poda de arbustos', 'Deshierbe', 'Abono ligero'],
+      },
+      premium: {
+        name: 'Premium',
+        rooms: 'Jardín grande + diseño',
+        features: ['Todo lo del Estándar', 'Diseño y acomodo de plantas', 'Fertilización profunda', 'Revisión de sistema de riego'],
+      },
+    },
+    extraServices: 'Servicios extra',
+    extras: {
+      pruning: 'Poda de árboles',
+      pestControl: 'Control de plagas',
+      irrigationCheck: 'Revisión de riego',
+      leafRemoval: 'Recolección de hojas',
+    },
+    planLabel: 'Plan',
+    extrasLabel: 'Extras',
+    scheduleButton: 'Agendar jardinería',
+  },
+  electricity: {
+    title: 'Electricidad',
+    heroTitle: 'Electricistas a domicilio',
+    heroSubtitle: 'Instalaciones seguras y certificadas',
+    propertyType: 'Tipo de propiedad',
+    property: { apartment: 'Departamento', house: 'Casa' },
+    chooseService: 'Elige el servicio',
+    services: {
+      outlet: {
+        name: 'Instalación de contacto',
+        features: ['Revisión del circuito', 'Instalación de contacto nuevo', 'Prueba de funcionamiento', 'Garantía de servicio'],
+      },
+      lighting: {
+        name: 'Instalación de iluminación',
+        features: ['Instalación de lámparas o focos', 'Conexión de interruptores', 'Prueba de encendido', 'Limpieza del área'],
+      },
+      panel: {
+        name: 'Revisión de panel eléctrico',
+        features: ['Inspección de breakers', 'Diagnóstico de fallas', 'Reporte de estado', 'Recomendaciones de seguridad'],
+      },
+      rewiring: {
+        name: 'Recableado completo',
+        features: ['Diagnóstico de instalación', 'Cambio de cableado', 'Pruebas de carga', 'Garantía de 90 días'],
+      },
+    },
+    propertySurcharge: 'Cargo por propiedad',
+    scheduleButton: 'Agendar servicio',
+  },
   cart: {
     title: 'Carrito',
     empty: {
       title: 'Tu carrito está vacío',
       subtitle: 'Agrega servicios o productos para continuar',
       button: 'Explorar servicios',
-    },
-    items: {
-      laundry5kg: { name: 'Lavado de Ropa (5kg)', detail: 'Plan 1-5 kg · $30/kg' },
-      sneakers: { name: 'Limpieza de Tenis', detail: '2 pares · $80 c/u' },
-      detergentPro: { name: 'Detergente Pulcro Pro', detail: '1 L' },
     },
     pickupAddress: 'Dirección de recogida',
     dateTime: 'Fecha y horario',
@@ -258,6 +391,14 @@ const en: typeof es = {
     confirm: 'Confirm',
     add: 'Add',
     popular: 'Popular',
+    close: 'Close',
+    back: 'Back',
+    clearSearch: 'Clear search',
+    removeItem: 'Remove item',
+    decreaseQuantity: 'Decrease quantity',
+    increaseQuantity: 'Increase quantity',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
   },
   tabs: {
     home: 'Home',
@@ -271,8 +412,19 @@ const en: typeof es = {
     searchPlaceholder: 'What service do you need today?',
     heroSubtitle: 'Home cleaning, simple and fast',
     heroBadge: 'We pick up and deliver',
+    promo: {
+      badge: "This week's deal",
+      title: '20% off house cleaning',
+      description: 'Valid this week on your first deep cleaning service.',
+      cta: 'Grab it',
+    },
     servicesTitle: 'Services',
     servicesSubtitle: 'Choose the category you need',
+    searchNoResults: 'We couldn\'t find any services with that name',
+    notifications: {
+      title: 'Notifications',
+      empty: 'You have no new notifications',
+    },
     popularTitle: 'Popular',
     viewAll: 'View all',
     categories: {
@@ -280,6 +432,9 @@ const en: typeof es = {
       garments: { title: 'Garment Cleaning', description: 'Hats, sneakers, belts, shoes, boots and caps.' },
       house: { title: 'House Cleaning', description: 'Professionals at your home. Deep and regular cleaning.' },
       car: { title: 'Car Cleaning', description: 'Interior and exterior detailing at your door.' },
+      plumbing: { title: 'Plumbing', description: 'Leak repair, pipe installation and more, at your door.' },
+      gardening: { title: 'Gardening', description: 'Garden maintenance and design by professionals.' },
+      electricity: { title: 'Electricity', description: 'Safe and fast electrical installations and repairs.' },
     },
     popularServices: {
       sneakers: 'Sneaker Cleaning',
@@ -302,6 +457,13 @@ const en: typeof es = {
       sneakersCleaning: 'Sneaker Cleaning',
       houseCleaning: 'House Cleaning',
     },
+    detailModal: {
+      title: 'Order detail',
+      orderId: 'Order number',
+      date: 'Date',
+      status: 'Status',
+      items: 'Items',
+    },
   },
   shop: {
     title: 'Shop',
@@ -314,7 +476,7 @@ const en: typeof es = {
       eco: 'Eco',
     },
     products: {
-      detergentPro: 'Pulcro Pro Detergent',
+      detergentPro: 'Cleano Pro Detergent',
       disinfectant: 'Multipurpose Disinfectant',
       sponges: 'Premium Sponges (3pc)',
       ecoCleaner: 'Bio Eco Cleaner',
@@ -336,8 +498,7 @@ const en: typeof es = {
       privacy: 'Privacy & security',
       help: 'Help & support',
     },
-    logout: 'Log out',
-    version: 'PULCRO v1.0.0',
+    version: 'CLEANO v1.0.0',
     addressLabels: { home: 'Home', work: 'Work', other: 'Other', new: 'New' },
     addressesModal: {
       title: 'My addresses',
@@ -355,6 +516,27 @@ const en: typeof es = {
       last4Placeholder: 'Last 4 digits',
       addButton: 'Add card',
       cashInStore: 'Cash payment in store',
+    },
+    notificationsModal: {
+      title: 'Notifications',
+      empty: 'You have no new notifications',
+    },
+    favoritesModal: {
+      title: 'Favorites',
+      empty: 'You have no favorite services or products yet',
+    },
+    helpModal: {
+      title: 'Help and support',
+      message: 'Need help? Write to us at soporte@cleano.app and we will get back to you as soon as possible.',
+    },
+    privacyModal: {
+      title: 'Privacy and security',
+      content: [
+        'At Cleano we collect your location only to confirm the pickup and delivery address for your orders.',
+        'We do not share your information with third parties, except as needed to complete the service you requested.',
+        'We do not use your location or data for advertising or tracking purposes.',
+        'You can request deletion of your data by writing to soporte@cleano.app.',
+      ],
     },
   },
   laundry: {
@@ -446,17 +628,101 @@ const en: typeof es = {
     vehicleSurcharge: 'Vehicle surcharge',
     scheduleButton: 'Schedule wash',
   },
+  plumbing: {
+    title: 'Plumbing',
+    heroTitle: 'Plumbing at your door',
+    heroSubtitle: 'Certified technicians, come to you',
+    urgencyType: 'Urgency level',
+    urgency: { normal: 'Normal', urgent: 'Urgent' },
+    chooseService: 'Choose the service',
+    services: {
+      unclog: {
+        name: 'Drain unclogging',
+        features: ['Problem diagnosis', 'Unclogging with professional equipment', 'Work area cleanup', 'Service guarantee'],
+      },
+      leak: {
+        name: 'Leak repair',
+        features: ['Leak location', 'Part repair or replacement', 'Pressure test', '30-day guarantee'],
+      },
+      faucet: {
+        name: 'Faucet installation',
+        features: ['Old faucet removal', 'New faucet installation', 'Leak test', 'Final cleanup'],
+      },
+      heater: {
+        name: 'Water heater',
+        features: ['Current installation review', 'Installation or repair', 'Function test', '90-day guarantee'],
+      },
+    },
+    urgencySurcharge: 'Urgency surcharge',
+    scheduleButton: 'Schedule service',
+  },
+  gardening: {
+    title: 'Gardening',
+    heroTitle: 'Garden care',
+    heroSubtitle: 'Professional gardeners at your home',
+    choosePlan: 'Choose your plan',
+    plans: {
+      basic: {
+        name: 'Basic',
+        rooms: 'Small garden',
+        features: ['Lawn mowing', 'Edge trimming', 'Debris removal', 'Plant watering'],
+      },
+      standard: {
+        name: 'Standard',
+        rooms: 'Medium garden',
+        features: ['Everything in Basic', 'Shrub pruning', 'Weeding', 'Light fertilizing'],
+      },
+      premium: {
+        name: 'Premium',
+        rooms: 'Large garden + design',
+        features: ['Everything in Standard', 'Plant design and arrangement', 'Deep fertilizing', 'Irrigation system check'],
+      },
+    },
+    extraServices: 'Extra services',
+    extras: {
+      pruning: 'Tree pruning',
+      pestControl: 'Pest control',
+      irrigationCheck: 'Irrigation check',
+      leafRemoval: 'Leaf removal',
+    },
+    planLabel: 'Plan',
+    extrasLabel: 'Extras',
+    scheduleButton: 'Schedule gardening',
+  },
+  electricity: {
+    title: 'Electricity',
+    heroTitle: 'Electricians at your door',
+    heroSubtitle: 'Safe and certified installations',
+    propertyType: 'Property type',
+    property: { apartment: 'Apartment', house: 'House' },
+    chooseService: 'Choose the service',
+    services: {
+      outlet: {
+        name: 'Outlet installation',
+        features: ['Circuit review', 'New outlet installation', 'Function test', 'Service guarantee'],
+      },
+      lighting: {
+        name: 'Lighting installation',
+        features: ['Lamp or bulb installation', 'Switch wiring', 'Power-on test', 'Area cleanup'],
+      },
+      panel: {
+        name: 'Electrical panel review',
+        features: ['Breaker inspection', 'Fault diagnosis', 'Status report', 'Safety recommendations'],
+      },
+      rewiring: {
+        name: 'Full rewiring',
+        features: ['Installation diagnosis', 'Wiring replacement', 'Load testing', '90-day guarantee'],
+      },
+    },
+    propertySurcharge: 'Property surcharge',
+    scheduleButton: 'Schedule service',
+  },
   cart: {
     title: 'Cart',
     empty: {
       title: 'Your cart is empty',
       subtitle: 'Add services or products to continue',
       button: 'Explore services',
-    },
-    items: {
-      laundry5kg: { name: 'Laundry Wash (5kg)', detail: '1-5 kg plan · $30/kg' },
-      sneakers: { name: 'Sneaker Cleaning', detail: '2 pairs · $80 each' },
-      detergentPro: { name: 'Pulcro Pro Detergent', detail: '1 L' },
     },
     pickupAddress: 'Pickup address',
     dateTime: 'Date and time',

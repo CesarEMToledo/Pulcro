@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
-import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react-native';
+import { Package, Clock, CheckCircle, Truck, ChevronRight, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -10,7 +11,7 @@ import ScreenHeader from '@/components/ScreenHeader';
 
 const ordersData = [
   {
-    id: 'PUL-2024-001',
+    id: 'CLE-2024-001',
     serviceKey: 'laundryByKilos' as const,
     statusKey: 'inProgress' as const,
     statusColor: Colors.warning,
@@ -20,7 +21,7 @@ const ordersData = [
     icon: 'laundry' as const,
   },
   {
-    id: 'PUL-2024-002',
+    id: 'CLE-2024-002',
     serviceKey: 'sneakersCleaning' as const,
     statusKey: 'delivered' as const,
     statusColor: Colors.success,
@@ -30,7 +31,7 @@ const ordersData = [
     icon: 'garments' as const,
   },
   {
-    id: 'PUL-2024-003',
+    id: 'CLE-2024-003',
     serviceKey: 'houseCleaning' as const,
     statusKey: 'pickedUp' as const,
     statusColor: Colors.primary,
@@ -44,6 +45,7 @@ const ordersData = [
 export default function OrdersScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const [selectedOrder, setSelectedOrder] = useState<(typeof ordersData)[number] | null>(null);
 
   const statusSteps = [
     { labelKey: 'pickedUp' as const, icon: Package },
@@ -63,7 +65,7 @@ export default function OrdersScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.activeTitle}>{t.orders.activeTitle}</Text>
-              <Text style={styles.activeId}>PUL-2024-001</Text>
+              <Text style={styles.activeId}>CLE-2024-001</Text>
             </View>
             <View style={[styles.statusPill, { backgroundColor: Colors.warning + '20' }]}>
               <Text style={[styles.statusText, { color: Colors.warning }]}>{t.orders.status.inProgress}</Text>
@@ -89,7 +91,7 @@ export default function OrdersScreen() {
 
         <Text style={styles.historyTitle}>{t.orders.historyTitle}</Text>
         {ordersData.map((order) => (
-          <TouchableOpacity key={order.id} activeOpacity={0.85} onPress={() => {}} style={styles.orderCard}>
+          <TouchableOpacity key={order.id} activeOpacity={0.85} onPress={() => setSelectedOrder(order)} style={styles.orderCard}>
             <View style={styles.orderLeft}>
               <View style={[styles.orderIcon, { backgroundColor: order.statusColor + '15' }]}>
                 <Package size={20} color={order.statusColor} strokeWidth={2.5} />
@@ -110,6 +112,56 @@ export default function OrdersScreen() {
         ))}
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+
+      {/* Order Detail Modal */}
+      <Modal visible={!!selectedOrder} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t.orders.detailModal.title}</Text>
+              <TouchableOpacity
+                onPress={() => setSelectedOrder(null)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
+                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+            {selectedOrder && (
+              <>
+                <View style={[styles.detailIconWrap, { backgroundColor: selectedOrder.statusColor + '15' }]}>
+                  <Package size={28} color={selectedOrder.statusColor} strokeWidth={2.5} />
+                </View>
+                <Text style={styles.detailServiceName}>{t.orders.services[selectedOrder.serviceKey]}</Text>
+                <View style={[styles.statusPillSmall, { backgroundColor: selectedOrder.statusColor + '15', alignSelf: 'center', marginBottom: Spacing.lg }]}>
+                  <Text style={[styles.statusTextSmall, { color: selectedOrder.statusColor }]}>{t.orders.status[selectedOrder.statusKey]}</Text>
+                </View>
+
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t.orders.detailModal.orderId}</Text>
+                  <Text style={styles.detailValue}>{selectedOrder.id}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t.orders.detailModal.date}</Text>
+                  <Text style={styles.detailValue}>{selectedOrder.date}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t.orders.detailModal.items}</Text>
+                  <Text style={styles.detailValue}>{selectedOrder.items}</Text>
+                </View>
+                <View style={styles.divider} />
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailTotalLabel}>{t.common.total}</Text>
+                  <Text style={styles.detailTotalValue}>{MXN(selectedOrder.total)}</Text>
+                </View>
+              </>
+            )}
+            <View style={{ height: Spacing.lg }} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -141,4 +193,20 @@ const styles = StyleSheet.create({
   statusTextSmall: { fontSize: 10, fontWeight: '700' },
   orderRight: { alignItems: 'flex-end', gap: Spacing.xs },
   orderTotal: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.primary },
+
+  // Detail modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalSheet: { backgroundColor: Colors.white, borderTopLeftRadius: Radius.xl, borderTopRightRadius: Radius.xl, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
+  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.border, alignSelf: 'center', marginTop: Spacing.sm, marginBottom: Spacing.md },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.lg },
+  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
+  modalClose: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  detailIconWrap: { width: 64, height: 64, borderRadius: Radius.full, justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: Spacing.md },
+  detailServiceName: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center', marginBottom: Spacing.sm },
+  detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: Spacing.sm },
+  detailLabel: { fontSize: FontSize.md, color: Colors.textSecondary },
+  detailValue: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  divider: { height: 1, backgroundColor: Colors.border, marginVertical: Spacing.sm },
+  detailTotalLabel: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
+  detailTotalValue: { fontSize: FontSize.xxl, fontWeight: '800', color: Colors.primary },
 });

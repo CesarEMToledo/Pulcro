@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
-import { Clock, Home, Sparkles, Users, Calendar } from 'lucide-react-native';
+import { Clock, Trees, Sparkles } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
@@ -19,33 +19,33 @@ import { bookingScreenStyles as bs } from '@/constants/bookingScreenStyles';
 const plansData = [
   {
     key: 'basic' as const,
-    price: 500,
-    duration: '3 hrs',
+    price: 350,
+    duration: '2 hrs',
     color: ['#1A6FD4', '#4A90E2'] as [string, string],
   },
   {
-    key: 'deep' as const,
-    price: 850,
-    duration: '5 hrs',
+    key: 'standard' as const,
+    price: 600,
+    duration: '4 hrs',
     color: ['#2ABFBF', '#00D4AA'] as [string, string],
     popular: true,
   },
   {
     key: 'premium' as const,
-    price: 1200,
-    duration: '8 hrs',
+    price: 950,
+    duration: '6 hrs',
     color: ['#0D4FA0', '#1A6FD4'] as [string, string],
   },
 ];
 
 const extrasData = [
-  { key: 'oven' as const, price: 80 },
-  { key: 'fridge' as const, price: 100 },
-  { key: 'windows' as const, price: 60 },
-  { key: 'ironing' as const, price: 120 },
+  { key: 'pruning' as const, price: 120 },
+  { key: 'pestControl' as const, price: 150 },
+  { key: 'irrigationCheck' as const, price: 80 },
+  { key: 'leafRemoval' as const, price: 90 },
 ];
 
-export default function HouseScreen() {
+export default function GardeningScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { addItem } = useCart();
@@ -60,15 +60,15 @@ export default function HouseScreen() {
   const total = plansData[selectedPlan].price + extrasTotal;
 
   const addToCart = () => {
-    const planName = t.house.plans[plansData[selectedPlan].key].name;
-    const detail = extrasSel.length > 0 ? `${t.house.extrasLabel} (${extrasSel.length})` : plansData[selectedPlan].duration;
+    const planName = t.gardening.plans[plansData[selectedPlan].key].name;
+    const detail = extrasSel.length > 0 ? `${t.gardening.extrasLabel} (${extrasSel.length})` : plansData[selectedPlan].duration;
     addItem(
       {
-        id: 'house-booking',
-        name: `${t.house.title} · ${planName}`,
+        id: 'gardening-booking',
+        name: `${t.gardening.title} · ${planName}`,
         detail,
         price: total,
-        image: ServiceIcons.house,
+        image: ServiceIcons.gardening,
       },
       { replace: true }
     );
@@ -77,17 +77,17 @@ export default function HouseScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title={t.house.title} />
+      <ScreenHeader title={t.gardening.title} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <ServiceHero
-          variant="house"
-          gradient={['#1A6FD4', '#2ABFBF']}
-          title={t.house.heroTitle}
-          subtitle={t.house.heroSubtitle}
+          variant="gardening"
+          gradient={['#1A9A9A', '#00D4AA']}
+          title={t.gardening.heroTitle}
+          subtitle={t.gardening.heroSubtitle}
         />
 
         <View style={bs.section}>
-          <Text style={bs.sectionTitle}>{t.house.choosePlan}</Text>
+          <Text style={bs.sectionTitle}>{t.gardening.choosePlan}</Text>
           {plansData.map((plan, i) => (
             <TouchableOpacity
               key={plan.key}
@@ -97,7 +97,7 @@ export default function HouseScreen() {
             >
               <LinearGradient colors={plan.color} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.planHeader}>
                 <View style={styles.planHeaderLeft}>
-                  <Text style={styles.planName}>{t.house.plans[plan.key].name}</Text>
+                  <Text style={styles.planName}>{t.gardening.plans[plan.key].name}</Text>
                   {plan.popular && (
                     <View style={bs.popularBadgeOnGradient}>
                       <Sparkles size={10} color={Colors.white} strokeWidth={2.5} />
@@ -114,11 +114,11 @@ export default function HouseScreen() {
                     <Text style={styles.planMetaText}>{plan.duration}</Text>
                   </View>
                   <View style={styles.planMetaItem}>
-                    <Home size={14} color={Colors.textMuted} strokeWidth={2.5} />
-                    <Text style={styles.planMetaText}>{t.house.plans[plan.key].rooms}</Text>
+                    <Trees size={14} color={Colors.textMuted} strokeWidth={2.5} />
+                    <Text style={styles.planMetaText}>{t.gardening.plans[plan.key].rooms}</Text>
                   </View>
                 </View>
-                {t.house.plans[plan.key].features.map((feat) => (
+                {t.gardening.plans[plan.key].features.map((feat) => (
                   <View key={feat} style={bs.featureRow}>
                     <View style={bs.featureDot} />
                     <Text style={bs.featureText}>{feat}</Text>
@@ -130,7 +130,7 @@ export default function HouseScreen() {
         </View>
 
         <View style={bs.section}>
-          <Text style={bs.sectionTitle}>{t.house.extraServices}</Text>
+          <Text style={bs.sectionTitle}>{t.gardening.extraServices}</Text>
           {extrasData.map((extra) => (
             <TouchableOpacity
               key={extra.key}
@@ -142,7 +142,7 @@ export default function HouseScreen() {
                 <View style={[styles.checkbox, extrasSel.includes(extra.key) && styles.checkboxActive]}>
                   {extrasSel.includes(extra.key) && <Text style={styles.checkText}>✓</Text>}
                 </View>
-                <Text style={styles.extraName}>{t.house.extras[extra.key]}</Text>
+                <Text style={styles.extraName}>{t.gardening.extras[extra.key]}</Text>
               </View>
               <Text style={styles.extraPrice}>+{MXN(extra.price)}</Text>
             </TouchableOpacity>
@@ -151,16 +151,16 @@ export default function HouseScreen() {
 
         <BookingSummaryCard
           rows={[
-            { label: `${t.house.planLabel} ${t.house.plans[plansData[selectedPlan].key].name}`, value: MXN(plansData[selectedPlan].price) },
+            { label: `${t.gardening.planLabel} ${t.gardening.plans[plansData[selectedPlan].key].name}`, value: MXN(plansData[selectedPlan].price) },
             ...(extrasSel.length > 0
-              ? [{ label: `${t.house.extrasLabel} (${extrasSel.length})`, value: MXN(extrasTotal) }]
+              ? [{ label: `${t.gardening.extrasLabel} (${extrasSel.length})`, value: MXN(extrasTotal) }]
               : []),
           ]}
           totalLabel={t.common.total}
           totalValue={MXN(total)}
         />
 
-        <PrimaryButton label={t.house.scheduleButton} onPress={addToCart} style={{ marginTop: Spacing.lg }} />
+        <PrimaryButton label={t.gardening.scheduleButton} onPress={addToCart} style={{ marginTop: Spacing.lg }} />
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
     </SafeAreaView>

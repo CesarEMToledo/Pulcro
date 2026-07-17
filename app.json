@@ -1,20 +1,22 @@
 {
   "expo": {
-    "name": "pulcro",
-    "slug": "pulcro",
+    "name": "cleano",
+    "slug": "cleano",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "cleano",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.cleano.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Pulcro usa tu ubicación para confirmar la dirección de recogida y entrega de tus pedidos."
+        "NSLocationWhenInUseUsageDescription": "Cleano usa tu ubicación para confirmar la dirección de recogida y entrega de tus pedidos."
       }
     },
     "android": {
+      "package": "com.cleano.app",
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": {
@@ -29,7 +31,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Pulcro usa tu ubicación para confirmar la dirección de recogida y entrega de tus pedidos."
+          "locationWhenInUsePermission": "Cleano usa tu ubicación para confirmar la dirección de recogida y entrega de tus pedidos."
         }
       ]
     ],

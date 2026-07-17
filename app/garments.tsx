@@ -1,5 +1,5 @@
 
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -9,7 +9,9 @@ import { Plus, Minus, ShoppingBag } from 'lucide-react-native';
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import FallbackImage from '@/components/FallbackImage';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
 
 const garmentTypesData = [
   { key: 'sneakers' as const, price: 80, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=300' },
@@ -23,6 +25,7 @@ const garmentTypesData = [
 export default function GarmentsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const getQty = (key: string) => quantities[key] || 0;
@@ -36,6 +39,25 @@ export default function GarmentsScreen() {
     return sum + (item ? item.price * qty : 0);
   }, 0);
 
+  const addToCart = () => {
+    Object.entries(quantities).forEach(([key, qty]) => {
+      if (qty <= 0) return;
+      const item = garmentTypesData.find((g) => g.key === key);
+      if (!item) return;
+      addItem(
+        {
+          id: `garment-${key}`,
+          name: t.garments.items[key as keyof typeof t.garments.items],
+          detail: t.garments.title,
+          price: item.price,
+          image: { uri: item.image },
+        },
+        { quantity: qty, replace: true }
+      );
+    });
+    router.push('/cart');
+  };
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader title={t.garments.title} />
@@ -45,7 +67,7 @@ export default function GarmentsScreen() {
         <View style={styles.grid}>
           {garmentTypesData.map((item) => (
             <View key={item.key} style={styles.card}>
-              <Image source={{ uri: item.image }} style={styles.cardImage} />
+              <FallbackImage source={{ uri: item.image }} style={styles.cardImage} />
               <Text style={styles.cardName}>{t.garments.items[item.key]}</Text>
               <Text style={styles.cardPrice}>{MXN(item.price)}</Text>
               {getQty(item.key) === 0 ? (
@@ -76,7 +98,7 @@ export default function GarmentsScreen() {
             <Text style={styles.bottomItems}>{totalItems} {totalItems === 1 ? t.garments.item : t.garments.itemsPlural}</Text>
             <Text style={styles.bottomTotal}>{MXN(totalPrice)}</Text>
           </View>
-          <PrimaryButton label={t.garments.continueButton} onPress={() => router.push('/cart')} />
+          <PrimaryButton label={t.garments.continueButton} onPress={addToCart} />
         </View>
       )}
     </SafeAreaView>

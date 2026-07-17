@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Modal,
   TextInput,
   FlatList,
@@ -24,14 +23,15 @@ import {
   X,
   Check,
   Plus,
+  Minus,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
+import FallbackImage from '@/components/FallbackImage';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-type CartItem = { id: string; name: string; detail: string; price: number; image: string };
+import { useCart } from '@/contexts/CartContext';
 
 type Address = { id: string; label: string; text: string };
 
@@ -56,12 +56,7 @@ const MXN = (n: number) => `$${n.toLocaleString('es-MX')} MXN`;
 export default function CartScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-
-  const INITIAL_ITEMS: CartItem[] = [
-    { id: '1', name: t.cart.items.laundry5kg.name, detail: t.cart.items.laundry5kg.detail, price: 150, image: 'https://images.pexels.com/photos/6210755/pexels-photo-6210755.jpeg?auto=compress&cs=tinysrgb&w=200' },
-    { id: '2', name: t.cart.items.sneakers.name, detail: t.cart.items.sneakers.detail, price: 160, image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=200' },
-    { id: '3', name: t.cart.items.detergentPro.name, detail: t.cart.items.detergentPro.detail, price: 85, image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=200' },
-  ];
+  const { items, removeItem, updateQuantity, clearAll } = useCart();
 
   const SAVED_ADDRESSES: Address[] = [
     { id: 'a1', label: t.cart.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
@@ -72,8 +67,6 @@ export default function CartScreen() {
   function formatDate(d: Date) {
     return `${t.cart.days[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${t.cart.months[d.getMonth()]}`;
   }
-
-  const [items, setItems] = useState<CartItem[]>(INITIAL_ITEMS);
 
   const [selectedAddressId, setSelectedAddressId] = useState('a1');
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -99,9 +92,6 @@ export default function CartScreen() {
     return d;
   });
 
-  const removeItem = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
-  const clearAll = () => setItems([]);
-
   const currentAddress = savedAddresses.find((a) => a.id === selectedAddressId)!;
   const currentPayment = SAVED_PAYMENTS.find((p) => p.id === selectedPaymentId)!;
 
@@ -114,7 +104,7 @@ export default function CartScreen() {
     setShowAddressModal(false);
   };
 
-  const subtotal = items.reduce((sum, i) => sum + i.price, 0);
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const total = subtotal;
 
   // Calendar helpers
@@ -152,6 +142,7 @@ export default function CartScreen() {
         title={t.cart.title}
         rightIcon={<Trash2 size={20} color={Colors.error} strokeWidth={2.5} />}
         onRightPress={() => setShowConfirm(true)}
+        rightAccessibilityLabel={t.cart.confirmCartTitle}
       />
 
       {items.length === 0 ? (
@@ -169,13 +160,42 @@ export default function CartScreen() {
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {items.map((item) => (
             <View key={item.id} style={styles.cartItem}>
-              <Image source={{ uri: item.image }} style={styles.itemImage} />
+              <FallbackImage source={item.image} style={styles.itemImage} />
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName}>{item.name}</Text>
                 <Text style={styles.itemDetail}>{item.detail}</Text>
-                <Text style={styles.itemPrice}>{MXN(item.price)}</Text>
+                <View style={styles.itemBottomRow}>
+                  <Text style={styles.itemPrice}>{MXN(item.price * item.quantity)}</Text>
+                  <View style={styles.qtyStepper}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => updateQuantity(item.id, item.quantity - 1)}
+                      style={styles.qtyBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel={t.common.decreaseQuantity}
+                    >
+                      <Minus size={14} color={Colors.primary} strokeWidth={2.5} />
+                    </TouchableOpacity>
+                    <Text style={styles.qtyValue}>{item.quantity}</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => updateQuantity(item.id, item.quantity + 1)}
+                      style={styles.qtyBtn}
+                      accessibilityRole="button"
+                      accessibilityLabel={t.common.increaseQuantity}
+                    >
+                      <Plus size={14} color={Colors.primary} strokeWidth={2.5} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-              <TouchableOpacity activeOpacity={0.7} onPress={() => removeItem(item.id)} style={styles.removeBtn}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => removeItem(item.id)}
+                style={styles.removeBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.removeItem}
+              >
                 <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -247,7 +267,14 @@ export default function CartScreen() {
             </View>
           </View>
 
-          <PrimaryButton label={t.cart.confirmOrder} onPress={() => router.push('/(tabs)/orders')} style={{ marginTop: Spacing.lg }} />
+          <PrimaryButton
+            label={t.cart.confirmOrder}
+            onPress={() => {
+              clearAll();
+              router.push('/(tabs)/orders');
+            }}
+            style={{ marginTop: Spacing.lg }}
+          />
           <View style={{ height: Spacing.xxl }} />
         </ScrollView>
       )}
@@ -259,7 +286,12 @@ export default function CartScreen() {
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t.cart.pickupAddress}</Text>
-              <TouchableOpacity onPress={() => setShowAddressModal(false)} style={styles.modalClose}>
+              <TouchableOpacity
+                onPress={() => setShowAddressModal(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -319,26 +351,42 @@ export default function CartScreen() {
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t.cart.dateTime}</Text>
-              <TouchableOpacity onPress={() => setShowScheduleModal(false)} style={styles.modalClose}>
+              <TouchableOpacity
+                onPress={() => setShowScheduleModal(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
 
             {/* Calendar */}
             <View style={styles.calendarHeader}>
-              <TouchableOpacity disabled={!canGoPrev} onPress={() => {
-                const d = new Date(viewMonth);
-                d.setMonth(d.getMonth() - 1);
-                setViewMonth(d);
-              }} style={[styles.calNav, !canGoPrev && { opacity: 0.3 }]}>
+              <TouchableOpacity
+                disabled={!canGoPrev}
+                onPress={() => {
+                  const d = new Date(viewMonth);
+                  d.setMonth(d.getMonth() - 1);
+                  setViewMonth(d);
+                }}
+                style={[styles.calNav, !canGoPrev && { opacity: 0.3 }]}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.previousMonth}
+              >
                 <ChevronLeft size={20} color={Colors.textPrimary} strokeWidth={2.5} />
               </TouchableOpacity>
               <Text style={styles.calMonthLabel}>{t.cart.months[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
-              <TouchableOpacity onPress={() => {
-                const d = new Date(viewMonth);
-                d.setMonth(d.getMonth() + 1);
-                setViewMonth(d);
-              }} style={styles.calNav}>
+              <TouchableOpacity
+                onPress={() => {
+                  const d = new Date(viewMonth);
+                  d.setMonth(d.getMonth() + 1);
+                  setViewMonth(d);
+                }}
+                style={styles.calNav}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.nextMonth}
+              >
                 <ChevronRight size={20} color={Colors.textPrimary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -416,7 +464,12 @@ export default function CartScreen() {
             <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t.cart.paymentMethod}</Text>
-              <TouchableOpacity onPress={() => setShowPaymentModal(false)} style={styles.modalClose}>
+              <TouchableOpacity
+                onPress={() => setShowPaymentModal(false)}
+                style={styles.modalClose}
+                accessibilityRole="button"
+                accessibilityLabel={t.common.close}
+              >
                 <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
@@ -492,7 +545,11 @@ const styles = StyleSheet.create({
   itemInfo: { flex: 1 },
   itemName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   itemDetail: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
-  itemPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary, marginTop: 4 },
+  itemBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
+  itemPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary },
+  qtyStepper: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.surface, paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.full },
+  qtyBtn: { width: 24, height: 24, borderRadius: Radius.full, backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center' },
+  qtyValue: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textPrimary, minWidth: 16, textAlign: 'center' },
   removeBtn: { width: 36, height: 36, borderRadius: Radius.full, backgroundColor: Colors.error + '12', justifyContent: 'center', alignItems: 'center' },
 
   sectionCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, ...Shadow.sm },

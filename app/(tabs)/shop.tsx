@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
 import { Search, ShoppingBag, Star } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
+import FallbackImage from '@/components/FallbackImage';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import ScreenHeader from '@/components/ScreenHeader';
@@ -23,13 +25,31 @@ const productsData = [
 export default function ShopScreen() {
   const router = useRouter();
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [activeCat, setActiveCat] = useState<typeof categoryKeys[number]>('all');
 
   const filtered = activeCat === 'all' ? productsData : productsData.filter((p) => p.cat === activeCat);
 
+  const addToCart = (prod: (typeof productsData)[number]) => {
+    addItem({
+      id: `product-${prod.key}`,
+      name: t.shop.products[prod.key],
+      detail: prod.unit === 'Pack' ? t.shop.unitPack : prod.unit,
+      price: prod.price,
+      image: { uri: prod.image },
+    });
+    router.push('/cart');
+  };
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title={t.shop.title} showBack={false} rightIcon={<ShoppingBag size={20} color={Colors.primary} strokeWidth={2.5} />} onRightPress={() => router.push('/cart')} />
+      <ScreenHeader
+        title={t.shop.title}
+        showBack={false}
+        rightIcon={<ShoppingBag size={20} color={Colors.primary} strokeWidth={2.5} />}
+        onRightPress={() => router.push('/cart')}
+        rightAccessibilityLabel={t.cart.title}
+      />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.searchBar}>
           <Search size={18} color={Colors.textMuted} strokeWidth={2.5} />
@@ -51,8 +71,8 @@ export default function ShopScreen() {
 
         <View style={styles.grid}>
           {filtered.map((prod) => (
-            <TouchableOpacity key={prod.key} activeOpacity={0.85} onPress={() => router.push('/cart')} style={styles.productCard}>
-              <Image source={{ uri: prod.image }} style={styles.productImage} />
+            <TouchableOpacity key={prod.key} activeOpacity={0.85} onPress={() => addToCart(prod)} style={styles.productCard}>
+              <FallbackImage source={{ uri: prod.image }} style={styles.productImage} />
               <View style={styles.productInfo}>
                 <Text style={styles.productName} numberOfLines={2}>{t.shop.products[prod.key]}</Text>
                 <View style={styles.ratingRow}>
@@ -64,7 +84,7 @@ export default function ShopScreen() {
                     <Text style={styles.price}>{MXN(prod.price)}</Text>
                     <Text style={styles.unit}>{prod.unit === 'Pack' ? t.shop.unitPack : prod.unit}</Text>
                   </View>
-                  <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/cart')} style={styles.addButton}>
+                  <TouchableOpacity activeOpacity={0.7} onPress={() => addToCart(prod)} style={styles.addButton}>
                     <ShoppingBag size={16} color={Colors.white} strokeWidth={2.5} />
                   </TouchableOpacity>
                 </View>
