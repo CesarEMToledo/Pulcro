@@ -152,7 +152,7 @@ export default function CartScreen() {
           </View>
           <Text style={styles.emptyTitle}>{t.cart.empty.title}</Text>
           <Text style={styles.emptySubtitle}>{t.cart.empty.subtitle}</Text>
-          <TouchableOpacity activeOpacity={0.7} onPress={() => router.back()} style={styles.emptyBtn}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/(tabs)')} style={styles.emptyBtn}>
             <Text style={styles.emptyBtnText}>{t.cart.empty.button}</Text>
           </TouchableOpacity>
         </View>
