@@ -14,12 +14,12 @@ import { useState } from 'react';
 const categoryKeys = ['all', 'detergents', 'disinfectants', 'accessories', 'eco'] as const;
 
 const productsData = [
-  { key: 'detergentPro' as const, price: 85, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.8, cat: 'detergents' as const },
-  { key: 'disinfectant' as const, price: 65, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.7, cat: 'disinfectants' as const },
-  { key: 'sponges' as const, price: 45, unit: 'Pack', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.9, cat: 'accessories' as const },
-  { key: 'ecoCleaner' as const, price: 95, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 5.0, cat: 'eco' as const },
-  { key: 'softener' as const, price: 55, unit: '1L', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.6, cat: 'detergents' as const },
-  { key: 'floorWax' as const, price: 75, unit: '500ml', image: 'https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.5, cat: 'accessories' as const },
+  { key: 'detergentPro' as const, price: 85, unit: '1L', image: 'https://images.pexels.com/photos/4239111/pexels-photo-4239111.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.8, cat: 'detergents' as const },
+  { key: 'disinfectant' as const, price: 65, unit: '1L', image: 'https://images.pexels.com/photos/4239130/pexels-photo-4239130.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.7, cat: 'disinfectants' as const },
+  { key: 'sponges' as const, price: 45, unit: 'Pack', image: 'https://images.pexels.com/photos/4239104/pexels-photo-4239104.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.9, cat: 'accessories' as const },
+  { key: 'ecoCleaner' as const, price: 95, unit: '1L', image: 'https://images.pexels.com/photos/4239100/pexels-photo-4239100.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 5.0, cat: 'eco' as const },
+  { key: 'softener' as const, price: 55, unit: '1L', image: 'https://images.pexels.com/photos/4239114/pexels-photo-4239114.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.6, cat: 'detergents' as const },
+  { key: 'floorWax' as const, price: 75, unit: '500ml', image: 'https://images.pexels.com/photos/6195949/pexels-photo-6195949.jpeg?auto=compress&cs=tinysrgb&w=300', rating: 4.5, cat: 'accessories' as const },
 ];
 
 export default function ShopScreen() {
