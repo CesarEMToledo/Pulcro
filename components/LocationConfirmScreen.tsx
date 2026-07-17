@@ -15,6 +15,24 @@ const DEFAULT_REGION: Region = {
   longitudeDelta: 0.01,
 };
 
+const LOCATION_TIMEOUT_MS = 10000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Location request timed out')), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
+
 interface Props {
   onConfirm: (address: string) => void;
 }
@@ -51,7 +69,10 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
   const locateDevice = async () => {
     setLocating(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await withTimeout(
+        Location.requestForegroundPermissionsAsync(),
+        LOCATION_TIMEOUT_MS
+      );
       if (status !== 'granted') {
         setPermissionDenied(true);
         await reverseGeocode(region);
@@ -60,7 +81,10 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
         return;
       }
       setPermissionDenied(false);
-      const position = await Location.getCurrentPositionAsync({});
+      const position = await withTimeout(
+        Location.getCurrentPositionAsync({}),
+        LOCATION_TIMEOUT_MS
+      );
       const nextRegion: Region = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -72,6 +96,7 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
       await reverseGeocode(nextRegion);
     } catch {
       setPermissionDenied(true);
+      await reverseGeocode(region);
     } finally {
       setLoading(false);
       setLocating(false);

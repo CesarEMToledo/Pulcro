@@ -36,3 +36,4 @@ yarn-error.*
 
 # office lock files
 .~lock.*#
+.gstack/

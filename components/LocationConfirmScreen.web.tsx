@@ -11,6 +11,24 @@ interface Props {
   onConfirm: (address: string) => void;
 }
 
+const LOCATION_TIMEOUT_MS = 10000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Location request timed out')), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
+
 export default function LocationConfirmScreen({ onConfirm }: Props) {
   const { t } = useLanguage();
   const [address, setAddress] = useState('');
@@ -21,12 +39,18 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
     setLocating(true);
     setError(false);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await withTimeout(
+        Location.requestForegroundPermissionsAsync(),
+        LOCATION_TIMEOUT_MS
+      );
       if (status !== 'granted') {
         setError(true);
         return;
       }
-      const position = await Location.getCurrentPositionAsync({});
+      const position = await withTimeout(
+        Location.getCurrentPositionAsync({}),
+        LOCATION_TIMEOUT_MS
+      );
       const { latitude, longitude } = position.coords;
       setAddress(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
     } catch {
@@ -54,7 +78,7 @@ export default function LocationConfirmScreen({ onConfirm }: Props) {
           <TextInput
             value={address}
             onChangeText={setAddress}
-            placeholder={t.location.detecting}
+            placeholder={t.location.addressPlaceholder}
             placeholderTextColor={Colors.textMuted}
             style={styles.input}
           />
