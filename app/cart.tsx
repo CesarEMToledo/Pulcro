@@ -33,6 +33,7 @@ import PrimaryButton from '@/components/PrimaryButton';
 import FallbackImage from '@/components/FallbackImage';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
+import { useLocation } from '@/contexts/LocationContext';
 
 type Address = { id: string; label: string; text: string };
 
@@ -58,9 +59,10 @@ export default function CartScreen() {
   const router = useRouter();
   const { t } = useLanguage();
   const { items, removeItem, updateQuantity, clearAll } = useCart();
+  const { address: confirmedAddress } = useLocation();
 
   const SAVED_ADDRESSES: Address[] = [
-    { id: 'a1', label: t.cart.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
+    { id: 'a1', label: t.cart.addressLabels.home, text: confirmedAddress || 'Av. Reforma 123, Col. Centro, CDMX' },
     { id: 'a2', label: t.cart.addressLabels.work, text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
     { id: 'a3', label: t.cart.addressLabels.other, text: 'Polanco 789, Col. Polanco, CDMX' },
   ];
