@@ -1,10 +1,14 @@
 import { Tabs } from 'expo-router';
-import { Colors } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors, FontSize } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Home, ShoppingBag, ClipboardList, User } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function TabLayout() {
   const { t } = useLanguage();
+  const insets = useSafeAreaInsets();
+  const tabBarBaseHeight = moderateScale(56);
 
   return (
     <Tabs
@@ -16,12 +20,12 @@ export default function TabLayout() {
           backgroundColor: Colors.white,
           borderTopColor: Colors.border,
           borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: tabBarBaseHeight + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, moderateScale(8)),
+          paddingTop: moderateScale(8),
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: FontSize.xs,
           fontWeight: '600',
         },
       }}

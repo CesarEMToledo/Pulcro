@@ -3,7 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Clock, Home, Sparkles, Users, Calendar } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -144,7 +145,7 @@ export default function HouseScreen() {
                 </View>
                 <Text style={styles.extraName}>{t.house.extras[extra.key]}</Text>
               </View>
-              <Text style={styles.extraPrice}>+{MXN(extra.price)}</Text>
+              <Text style={styles.extraPrice} numberOfLines={1}>+{MXN(extra.price)}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -169,23 +170,23 @@ export default function HouseScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   planCard: { borderRadius: Radius.lg, overflow: 'hidden', marginBottom: Spacing.md, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
   planCardActive: { borderColor: Colors.primary },
   planHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing.md },
-  planHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  planName: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.white },
+  planHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, flex: 1, marginRight: Spacing.sm },
+  planName: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.white, flexShrink: 1 },
   planPrice: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.white },
   planBody: { backgroundColor: Colors.white, padding: Spacing.md },
   planMetaRow: { flexDirection: 'row', gap: Spacing.lg, marginBottom: Spacing.md },
   planMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   planMetaText: { fontSize: FontSize.sm, color: Colors.textMuted },
-  extraCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  extraCardActive: { borderColor: Colors.secondary },
-  extraLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
+  extraCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.sm, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
+  extraCardActive: { borderColor: Colors.secondary, backgroundColor: Colors.secondary + '10' },
+  extraLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
+  checkbox: { width: moderateScale(22), height: moderateScale(22), borderRadius: moderateScale(6), borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
   checkboxActive: { backgroundColor: Colors.secondary, borderColor: Colors.secondary },
-  checkText: { color: Colors.white, fontWeight: '700', fontSize: 14 },
-  extraName: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
-  extraPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.secondary },
+  checkText: { color: Colors.white, fontWeight: '700', fontSize: FontSize.sm - 1 },
+  extraName: { fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary, flex: 1, flexShrink: 1 },
+  extraPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.secondary, flexShrink: 0 },
 });

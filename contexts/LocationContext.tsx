@@ -7,6 +7,7 @@ interface LocationContextValue {
   address: string | null;
   isReady: boolean;
   confirmLocation: (address: string) => Promise<void>;
+  clearAddress: () => Promise<void>;
 }
 
 const LocationContext = createContext<LocationContextValue | undefined>(undefined);
@@ -26,8 +27,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, next);
   };
 
+  // Lets the user re-open the full-screen location picker (e.g. from a
+  // "change address" button) by clearing the confirmed address — the root
+  // navigator already falls back to <LocationConfirmScreen> whenever
+  // `address` is null.
+  const clearAddress = async () => {
+    setAddress(null);
+    await AsyncStorage.removeItem(STORAGE_KEY);
+  };
+
   const value = useMemo<LocationContextValue>(
-    () => ({ address, isReady, confirmLocation }),
+    () => ({ address, isReady, confirmLocation, clearAddress }),
     [address, isReady]
   );
 

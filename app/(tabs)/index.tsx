@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 import { Search, Bell, MapPin, Star, Clock, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from '@/contexts/LocationContext';
@@ -14,7 +15,7 @@ import FallbackImage from '@/components/FallbackImage';
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
 import CategoryTile from '@/components/CategoryTile';
 import SectionHeader from '@/components/SectionHeader';
-import PromoCard from '@/components/PromoCard';
+import HeroCarousel from '@/components/HeroCarousel';
 
 const categoriesData = [
   { key: 'laundry' as const, route: '/laundry' as const },
@@ -24,6 +25,35 @@ const categoriesData = [
   { key: 'plumbing' as const, route: '/plumbing' as const },
   { key: 'gardening' as const, route: '/gardening' as const },
   { key: 'electricity' as const, route: '/electricity' as const },
+];
+
+// Static data for the 4 best-offers hero carousel: reuses the same
+// gradients/routes as the service categories below for visual consistency.
+const heroOffersMeta = [
+  {
+    key: 'laundry' as const,
+    image: 'https://images.pexels.com/photos/4210378/pexels-photo-4210378.jpeg?auto=compress&cs=tinysrgb&w=300',
+    gradient: ['#1A6FD4', '#2ABFBF'] as [string, string],
+    route: '/laundry' as const,
+  },
+  {
+    key: 'garments' as const,
+    image: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=300',
+    gradient: ['#2ABFBF', '#00D4AA'] as [string, string],
+    route: '/garments' as const,
+  },
+  {
+    key: 'house' as const,
+    image: 'https://images.pexels.com/photos/4239031/pexels-photo-4239031.jpeg?auto=compress&cs=tinysrgb&w=300',
+    gradient: ['#1A6FD4', '#4A90E2'] as [string, string],
+    route: '/house' as const,
+  },
+  {
+    key: 'car' as const,
+    image: 'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg?auto=compress&cs=tinysrgb&w=300',
+    gradient: ['#0D4FA0', '#1A6FD4'] as [string, string],
+    route: '/car' as const,
+  },
 ];
 
 const popularServicesData = [
@@ -53,10 +83,10 @@ const popularServicesData = [
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { address } = useLocation();
+  const { address, clearAddress } = useLocation();
   const { addItem } = useCart();
+  const { wp, isTablet } = useResponsive();
   const [searchQuery, setSearchQuery] = useState('');
-  const [showNotifications, setShowNotifications] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -68,18 +98,27 @@ export default function HomeScreen() {
   );
   const hasNoResults = normalizedQuery.length > 0 && filteredCategories.length === 0 && filteredPopular.length === 0;
 
+  // Dynamic sizes driven by the current window width (rule: useWindowDimensions
+  // for cards/banners/images), clamped so they stay reasonable on very small
+  // or very large (tablet) screens.
+  const popularCardWidth = Math.max(150, Math.min(isTablet ? 240 : 200, wp(46)));
+
+  const heroOffers = heroOffersMeta.map((offer) => ({
+    key: offer.key,
+    title: t.home.heroOffers[offer.key].title,
+    subtitle: t.home.heroOffers[offer.key].subtitle,
+    badge: t.home.heroOffers[offer.key].badge,
+    image: offer.image,
+    gradient: offer.gradient,
+    onPress: () => router.push(offer.route),
+  }));
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View style={styles.headerTextWrap}>
-              <Text style={styles.greeting}>{t.home.greeting}</Text>
-              <View style={styles.locationRow}>
-                <MapPin size={14} color={Colors.primary} strokeWidth={2.5} />
-                <Text style={styles.location} numberOfLines={1}>{address || t.home.location}</Text>
-              </View>
-            </View>
+            <Text style={styles.brandTitle}>PULCRO</Text>
             <View style={styles.headerActions}>
               <LanguageToggle />
               <TouchableOpacity
@@ -88,14 +127,24 @@ export default function HomeScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={t.home.notifications.title}
                 onPress={() => {
-                  setShowNotifications(true);
                   setHasUnread(false);
+                  router.push('/notifications');
                 }}
               >
                 <Bell size={20} color={Colors.primary} strokeWidth={2.5} />
                 {hasUnread && <View style={styles.badge} />}
               </TouchableOpacity>
             </View>
+          </View>
+
+          <View style={styles.locationRowWrap}>
+            <View style={styles.locationRow}>
+              <MapPin size={14} color={Colors.primary} strokeWidth={2.5} />
+              <Text style={styles.location} numberOfLines={1}>{address || t.home.location}</Text>
+            </View>
+            <TouchableOpacity activeOpacity={0.7} onPress={() => clearAddress()} style={styles.changeLocationBtn}>
+              <Text style={styles.changeLocationText}>{t.common.change}</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.searchBar}>
@@ -120,29 +169,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.heroCard}>
-          <LinearGradient colors={['#1A6FD4', '#2ABFBF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroGradient}>
-            <View style={styles.heroContent}>
-              <Text style={styles.heroTitle}>CLEANO</Text>
-              <Text style={styles.heroSubtitle}>{t.home.heroSubtitle}</Text>
-              <View style={styles.heroBadge}>
-                <Text style={styles.heroBadgeText}>{t.home.heroBadge}</Text>
-              </View>
-            </View>
-            <FallbackImage
-              source={{ uri: 'https://images.pexels.com/photos/4210378/pexels-photo-4210378.jpeg?auto=compress&cs=tinysrgb&w=300' }}
-              style={styles.heroImage}
-            />
-          </LinearGradient>
-        </View>
-
-        <PromoCard
-          badge={t.home.promo.badge}
-          title={t.home.promo.title}
-          description={t.home.promo.description}
-          ctaText={t.home.promo.cta}
-          onPress={() => router.push('/shop')}
-        />
+        <HeroCarousel offers={heroOffers} />
 
         {hasNoResults ? (
           <View style={styles.noResults}>
@@ -185,7 +212,7 @@ export default function HomeScreen() {
                         });
                         router.push('/cart');
                       }}
-                      style={styles.popularCard}
+                      style={[styles.popularCard, { width: popularCardWidth }]}
                     >
                       <FallbackImage source={{ uri: svc.image }} style={styles.popularImage} />
                       <View style={styles.popularInfo}>
@@ -212,68 +239,34 @@ export default function HomeScreen() {
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
-
-      <Modal visible={showNotifications} animationType="fade" transparent>
-        <View style={styles.notifOverlay}>
-          <View style={styles.notifCard}>
-            <View style={styles.notifHeader}>
-              <Text style={styles.notifTitle}>{t.home.notifications.title}</Text>
-              <TouchableOpacity
-                onPress={() => setShowNotifications(false)}
-                style={styles.notifClose}
-                accessibilityRole="button"
-                accessibilityLabel={t.common.close}
-              >
-                <X size={20} color={Colors.textSecondary} strokeWidth={2.5} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.notifEmpty}>
-              <Bell size={32} color={Colors.textMuted} strokeWidth={1.5} />
-              <Text style={styles.notifEmptyText}>{t.home.notifications.empty}</Text>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { paddingBottom: 20, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.md },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing.md },
-  headerTextWrap: { flex: 1, marginRight: Spacing.sm },
-  greeting: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.textPrimary },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
+  brandTitle: { fontSize: FontSize.xxl, fontWeight: '800', color: Colors.primary, letterSpacing: 0.5 },
+  locationRowWrap: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1, marginRight: Spacing.sm },
   location: { flex: 1, fontSize: FontSize.sm, color: Colors.textSecondary },
+  changeLocationBtn: { paddingHorizontal: Spacing.sm, paddingVertical: 6, borderRadius: Radius.full, backgroundColor: Colors.primary + '12' },
+  changeLocationText: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.primary },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  bellButton: { width: 44, height: 44, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
-  badge: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.error },
+  bellButton: { width: moderateScale(44), height: moderateScale(44), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  badge: { position: 'absolute', top: moderateScale(10), right: moderateScale(10), width: moderateScale(8), height: moderateScale(8), borderRadius: moderateScale(4), backgroundColor: Colors.error },
   searchBar: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.surface, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md + 2, marginBottom: Spacing.lg },
   searchInput: { flex: 1, fontSize: FontSize.md, color: Colors.textPrimary, padding: 0 },
+  searchPlaceholder: { fontSize: FontSize.md, color: Colors.textMuted },
   noResults: { alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.xxl, gap: Spacing.md },
   noResultsText: { fontSize: FontSize.md, color: Colors.textMuted, textAlign: 'center', paddingHorizontal: Spacing.xl },
-  notifOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing.xl },
-  notifCard: { width: '100%', backgroundColor: Colors.white, borderRadius: Radius.xl, padding: Spacing.lg, ...Shadow.lg },
-  notifHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
-  notifTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
-  notifClose: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
-  notifEmpty: { alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.xl, gap: Spacing.md },
-  notifEmptyText: { fontSize: FontSize.md, color: Colors.textMuted, textAlign: 'center' },
-  heroCard: { marginHorizontal: Spacing.lg, marginBottom: Spacing.xl, borderRadius: Radius.xl, overflow: 'hidden', ...Shadow.lg },
-  heroGradient: { flexDirection: 'row', alignItems: 'center', padding: Spacing.lg, borderRadius: Radius.xl },
-  heroContent: { flex: 1 },
-  heroTitle: { fontSize: FontSize.xxxl, fontWeight: '800', color: Colors.white, letterSpacing: 1 },
-  heroSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)', marginTop: 4, marginBottom: Spacing.sm },
-  heroBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: Spacing.sm, paddingVertical: 4, borderRadius: Radius.full },
-  heroBadgeText: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.white },
-  heroImage: { width: 100, height: 100, borderRadius: Radius.md, resizeMode: 'cover' },
   section: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.xl },
   categoriesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: Spacing.lg },
   horizontalScroll: { gap: Spacing.md, paddingRight: Spacing.lg },
-  popularCard: { width: 180, backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', ...Shadow.sm },
-  popularImage: { width: '100%', height: 120, resizeMode: 'cover' },
+  popularCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', ...Shadow.sm },
+  popularImage: { width: '100%', aspectRatio: 1.5, resizeMode: 'cover' },
   popularInfo: { padding: Spacing.sm },
   popularName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textPrimary, marginBottom: 4 },
   popularMeta: { flexDirection: 'row', gap: Spacing.sm, marginBottom: 4 },

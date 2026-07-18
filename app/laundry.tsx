@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Minus, Plus, Truck, Shield, Leaf } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -155,18 +156,18 @@ export default function LaundryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   stepperCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
-  stepperBtn: { width: 48, height: 48, borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
+  stepperBtn: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.full, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center' },
   stepperValue: { alignItems: 'center' },
   kgValue: { fontSize: FontSize.xxxl, fontWeight: '800', color: Colors.textPrimary },
   kgLabel: { fontSize: FontSize.sm, color: Colors.textMuted },
-  tierCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  tierCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
-  tierLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  radio: { width: 22, height: 22, borderRadius: Radius.full, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
+  tierCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.sm, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
+  tierCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '12' },
+  tierLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
+  radio: { width: moderateScale(22), height: moderateScale(22), borderRadius: Radius.full, borderWidth: 2, borderColor: Colors.border, justifyContent: 'center', alignItems: 'center' },
   radioActive: { borderColor: Colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
+  radioDot: { width: moderateScale(10), height: moderateScale(10), borderRadius: moderateScale(5), backgroundColor: Colors.primary },
   tierKg: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   tierKgActive: { color: Colors.primary },
   tierPrice: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
@@ -175,6 +176,6 @@ const styles = StyleSheet.create({
   tierHint: { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: Spacing.sm, textAlign: 'center' },
   featuresRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.xl },
   featureItem: { alignItems: 'center', flex: 1 },
-  featureIcon: { width: 48, height: 48, borderRadius: Radius.md, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
+  featureIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.md, backgroundColor: Colors.surface, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.sm },
   featureText: { fontSize: FontSize.xs, fontWeight: '500', color: Colors.textSecondary, textAlign: 'center' },
 });

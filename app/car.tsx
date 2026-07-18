@@ -3,7 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Car, Sparkles, Droplets, Wind } from 'lucide-react-native';
 
 const MXN = (n: number) => `${n.toLocaleString('es-MX')} MXN`;
@@ -166,20 +167,20 @@ export default function CarScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   vehicleScroll: { gap: Spacing.sm, paddingRight: Spacing.lg },
   vehicleChip: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.white, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, borderRadius: Radius.lg, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  vehicleChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '08' },
+  vehicleChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '12' },
   vehicleText: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
   vehicleTextActive: { color: Colors.primary },
   vehicleExtra: { fontSize: FontSize.xs, color: Colors.textMuted },
   vehicleExtraActive: { color: Colors.primary },
   svcCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.md, borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-  svcCardActive: { borderColor: Colors.primary },
+  svcCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primary + '10' },
   svcHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  svcIcon: { width: 48, height: 48, borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
+  svcIcon: { width: moderateScale(48), height: moderateScale(48), borderRadius: Radius.md, justifyContent: 'center', alignItems: 'center' },
   svcTitleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  svcName: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary },
+  svcName: { fontSize: FontSize.md, fontWeight: '700', color: Colors.textPrimary, flexShrink: 1 },
   svcDuration: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   svcPrice: { fontSize: FontSize.lg, fontWeight: '800', color: Colors.primary },
   svcFeatures: { marginTop: Spacing.md, paddingTop: Spacing.md, borderTopWidth: 1, borderTopColor: Colors.border },

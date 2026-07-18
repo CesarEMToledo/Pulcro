@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, Layout } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { Search, ShoppingBag, Star } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
@@ -100,7 +101,7 @@ export default function ShopScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm },
+  scrollContent: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, width: '100%', maxWidth: Layout.maxContentWidth, alignSelf: 'center' },
   searchBar: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.surface, borderRadius: Radius.lg, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md + 2, marginBottom: Spacing.md },
   searchPlaceholder: { fontSize: FontSize.md, color: Colors.textMuted },
   catScroll: { gap: Spacing.sm, marginBottom: Spacing.lg, paddingRight: Spacing.lg },
@@ -110,13 +111,13 @@ const styles = StyleSheet.create({
   catTextActive: { color: Colors.white },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.md, justifyContent: 'space-between' },
   productCard: { width: '47%', backgroundColor: Colors.white, borderRadius: Radius.lg, overflow: 'hidden', ...Shadow.sm },
-  productImage: { width: '100%', height: 120, resizeMode: 'cover' },
+  productImage: { width: '100%', aspectRatio: 1.3, resizeMode: 'cover' },
   productInfo: { padding: Spacing.sm },
-  productName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textPrimary, marginBottom: 4, minHeight: 36 },
+  productName: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textPrimary, marginBottom: 4, minHeight: moderateScale(36) },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 2, marginBottom: Spacing.sm },
   ratingText: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.textSecondary },
   priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   price: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary },
   unit: { fontSize: FontSize.xs, color: Colors.textMuted },
-  addButton: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  addButton: { width: moderateScale(32), height: moderateScale(32), borderRadius: Radius.full, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
 });

@@ -1,3 +1,5 @@
+import { scaleFont, scaleSpacing } from './responsive';
+
 export const Colors = {
   primary: '#1A6FD4',
   primaryLight: '#4A90E2',
@@ -22,31 +24,40 @@ export const Colors = {
   gradientEnd: '#2ABFBF',
 };
 
+// Base spacing/radius/font values are scaled once at module load based on the
+// device's screen width (see constants/responsive.ts), so every screen that
+// already consumes these design tokens becomes responsive automatically —
+// larger on tablets, gently smaller on compact phones — without needing to
+// touch each individual style declaration across the app.
 export const Spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
+  xs: scaleSpacing(4),
+  sm: scaleSpacing(8),
+  md: scaleSpacing(16),
+  lg: scaleSpacing(24),
+  xl: scaleSpacing(32),
+  xxl: scaleSpacing(48),
 };
 
 export const Radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  sm: scaleSpacing(8),
+  md: scaleSpacing(12),
+  lg: scaleSpacing(16),
+  xl: scaleSpacing(24),
   full: 999,
 };
 
 export const FontSize = {
-  xs: 11,
-  sm: 13,
-  md: 15,
-  lg: 17,
-  xl: 20,
-  xxl: 24,
-  xxxl: 30,
+  xs: scaleFont(11),
+  sm: scaleFont(13),
+  md: scaleFont(15),
+  lg: scaleFont(17),
+  xl: scaleFont(20),
+  xxl: scaleFont(24),
+  xxxl: scaleFont(30),
+};
+
+export const Layout = {
+  maxContentWidth: 560,
 };
 
 export const Shadow = {

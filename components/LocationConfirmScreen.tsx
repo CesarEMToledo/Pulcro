@@ -5,6 +5,7 @@ import MapView, { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { MapPin, LocateFixed, CircleAlert } from 'lucide-react-native';
 import { Colors, Spacing, FontSize, Radius, Shadow } from '@/constants/theme';
+import { moderateScale } from '@/constants/responsive';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PrimaryButton from '@/components/PrimaryButton';
 
@@ -240,8 +241,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   addressIcon: {
-    width: 40,
-    height: 40,
+    width: moderateScale(40),
+    height: moderateScale(40),
     borderRadius: Radius.md,
     backgroundColor: Colors.primary + '15',
     justifyContent: 'center',

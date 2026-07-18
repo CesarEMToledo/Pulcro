@@ -12,9 +12,9 @@ interface Props {
 export default function SectionHeader({ title, subtitle, actionText, onAction }: Props) {
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>{title}</Text>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      <View style={styles.textWrap}>
+        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        {subtitle && <Text style={styles.subtitle} numberOfLines={2}>{subtitle}</Text>}
       </View>
       {actionText && (
         <TouchableOpacity activeOpacity={0.7} onPress={onAction} style={styles.action}>
@@ -31,7 +31,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: Spacing.sm,
     marginBottom: Spacing.md,
+  },
+  textWrap: {
+    flex: 1,
   },
   title: {
     fontSize: FontSize.xl,
