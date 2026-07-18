@@ -220,7 +220,7 @@ export default function HomeScreen() {
                         <View style={styles.popularMeta}>
                           <View style={styles.ratingRow}>
                             <Star size={12} color={Colors.warning} strokeWidth={2.5} fill={Colors.warning} />
-                            <Text style={styles.ratingText}>{svc.rating}</Text>
+                            <Text style={styles.ratingText}>{svc.rating.toFixed(1)}</Text>
                           </View>
                           <View style={styles.ratingRow}>
                             <Clock size={12} color={Colors.textMuted} strokeWidth={2.5} />

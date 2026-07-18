@@ -78,7 +78,7 @@ export default function ShopScreen() {
                 <Text style={styles.productName} numberOfLines={2}>{t.shop.products[prod.key]}</Text>
                 <View style={styles.ratingRow}>
                   <Star size={12} color={Colors.warning} strokeWidth={2.5} fill={Colors.warning} />
-                  <Text style={styles.ratingText}>{prod.rating}</Text>
+                  <Text style={styles.ratingText}>{prod.rating.toFixed(1)}</Text>
                 </View>
                 <View style={styles.priceRow}>
                   <View>
