@@ -62,7 +62,7 @@ export default function CartScreen() {
   const { address: confirmedAddress } = useLocation();
 
   const SAVED_ADDRESSES: Address[] = [
-    { id: 'a1', label: t.cart.addressLabels.home, text: confirmedAddress || 'Av. Reforma 123, Col. Centro, CDMX' },
+    { id: 'a1', label: t.cart.addressLabels.home, text: 'Av. Reforma 123, Col. Centro, CDMX' },
     { id: 'a2', label: t.cart.addressLabels.work, text: 'Insurgentes Sur 456, Col. Del Valle, CDMX' },
     { id: 'a3', label: t.cart.addressLabels.other, text: 'Polanco 789, Col. Polanco, CDMX' },
   ];
@@ -95,7 +95,12 @@ export default function CartScreen() {
     return d;
   });
 
-  const currentAddress = savedAddresses.find((a) => a.id === selectedAddressId)!;
+  // The "Casa" entry always mirrors the address confirmed at onboarding
+  // (LocationContext), even if it resolves after this screen's first render.
+  const displayAddresses = savedAddresses.map((a) =>
+    a.id === 'a1' && confirmedAddress ? { ...a, text: confirmedAddress } : a
+  );
+  const currentAddress = displayAddresses.find((a) => a.id === selectedAddressId)!;
   const currentPayment = SAVED_PAYMENTS.find((p) => p.id === selectedPaymentId)!;
 
   const addNewAddress = () => {
@@ -300,7 +305,7 @@ export default function CartScreen() {
             </View>
 
             <FlatList
-              data={savedAddresses}
+              data={displayAddresses}
               keyExtractor={(a) => a.id}
               style={{ maxHeight: 220 }}
               renderItem={({ item }) => (
