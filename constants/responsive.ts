@@ -40,13 +40,24 @@ export function hp(percentage: number, height: number = SCREEN_HEIGHT): number {
 }
 
 /**
+ * Widths beyond this stop increasing the scale ratio. Without a cap, spacing
+ * and radii keep growing linearly with window width on web — on a wide
+ * desktop viewport that inflates gaps enough to break percentage-based grids
+ * (e.g. two 47%-wide cards + a scaled-up gap no longer fit in one row).
+ * Matches the `isTablet` breakpoint below: past tablet size, absolute
+ * spacing should stay constant rather than keep scaling toward desktop
+ * widths that were never part of the reference design.
+ */
+const MAX_SCALE_WIDTH = 768;
+
+/**
  * Moderate scale: scales a size toward the device's width ratio, but only
  * partially (via `factor`), so spacing doesn't blow up on tablets or shrink
  * too aggressively on small phones. This is the standard technique used by
  * libraries like react-native-size-matters.
  */
 export function moderateScale(size: number, factor = 0.5, width: number = SCREEN_WIDTH): number {
-  const ratio = width / BASE_WIDTH;
+  const ratio = Math.min(width, MAX_SCALE_WIDTH) / BASE_WIDTH;
   return size + (size * ratio - size) * factor;
 }
 
