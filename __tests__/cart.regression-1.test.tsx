@@ -6,9 +6,9 @@ import { LocationProvider } from '@/contexts/LocationContext';
 import { CartProvider, useCart } from '@/contexts/CartContext';
 import CartScreen from '../app/cart';
 
-// Regression: ISSUE-005 — cart pickup address ignored the user's confirmed location
+// Regression: ISSUE-006 — cart pickup address ignored the user's confirmed location
 // Found by /qa on 2026-07-18
-// Report: .gstack/qa-reports/qa-report-localhost-2026-07-18.md
+// Report: .gstack/qa-reports/qa-report-localhost-8081-2026-07-18.md
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
