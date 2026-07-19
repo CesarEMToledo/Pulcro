@@ -10,3 +10,4 @@ Icons sourced from [microsoft/fluentui-emoji](https://github.com/microsoft/fluen
 | gardening.png | Potted plant |
 | electricity.png | High voltage |
 | shop.png | Department store |
+| carpets.png | Broom |

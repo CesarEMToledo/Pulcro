@@ -1,6 +1,6 @@
 import { ImageSourcePropType } from 'react-native';
 
-export type ServiceIconKey = 'laundry' | 'garments' | 'house' | 'car' | 'plumbing' | 'gardening' | 'electricity' | 'shop';
+export type ServiceIconKey = 'laundry' | 'garments' | 'house' | 'car' | 'plumbing' | 'gardening' | 'electricity' | 'shop' | 'carpets';
 
 export const ServiceIcons: Record<ServiceIconKey, ImageSourcePropType> = {
   laundry: require('@/assets/images/icons/laundry.png'),
@@ -11,4 +11,5 @@ export const ServiceIcons: Record<ServiceIconKey, ImageSourcePropType> = {
   gardening: require('@/assets/images/icons/gardening.png'),
   electricity: require('@/assets/images/icons/electricity.png'),
   shop: require('@/assets/images/icons/shop.png'),
+  carpets: require('@/assets/images/icons/carpets.png'),
 };

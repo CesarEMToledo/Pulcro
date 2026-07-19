@@ -60,6 +60,7 @@ const es = {
       plumbing: { title: 'Plomería', description: 'Reparación de fugas, instalación de tuberías y más, a domicilio.' },
       gardening: { title: 'Jardinería', description: 'Mantenimiento y diseño de jardines por profesionales.' },
       electricity: { title: 'Electricidad', description: 'Instalaciones y reparaciones eléctricas seguras y rápidas.' },
+      carpets: { title: 'Limpieza de Alfombras', description: 'Alfombras y tapetes libres de manchas, polvo y ácaros.' },
       shop: { title: 'Tienda', description: 'Detergentes, desinfectantes y accesorios de limpieza.' },
     },
     popularServices: {
@@ -368,6 +369,27 @@ const es = {
     propertySurcharge: 'Cargo por propiedad',
     scheduleButton: 'Agendar servicio',
   },
+  carpets: {
+    title: 'Limpieza de Alfombras',
+    heroTitle: 'Alfombras Como Nuevas',
+    heroSubtitle: 'Limpieza profunda que elimina manchas y ácaros',
+    choosePlan: '¿Cuánto necesitas limpiar?',
+    plans: {
+      small: { name: 'Básico', rooms: '1-2 tapetes', features: ['Aspirado profundo', 'Cepillado a mano', 'Secado en 4 hrs'] },
+      medium: { name: 'Estándar', rooms: 'Hasta 4 áreas', features: ['Todo lo del plan Básico', 'Champú antibacterial', 'Cepillado con máquina'] },
+      large: { name: 'Premium', rooms: 'Casa completa', features: ['Todo lo del plan Estándar', 'Protector antimanchas', 'Garantía de 30 días'] },
+    },
+    extraServices: 'Servicios adicionales',
+    extras: {
+      stainRemoval: 'Eliminación de manchas',
+      sanitizing: 'Sanitización antibacterial',
+      deodorizing: 'Desodorización',
+      quickDry: 'Secado rápido',
+    },
+    extrasLabel: 'Extras',
+    planLabel: 'Plan',
+    scheduleButton: 'Agendar Limpieza',
+  },
   cart: {
     title: 'Carrito',
     empty: {
@@ -472,6 +494,7 @@ const en: typeof es = {
       plumbing: { title: 'Plumbing', description: 'Leak repair, pipe installation and more, at your door.' },
       gardening: { title: 'Gardening', description: 'Garden maintenance and design by professionals.' },
       electricity: { title: 'Electricity', description: 'Safe and fast electrical installations and repairs.' },
+      carpets: { title: 'Carpet Cleaning', description: 'Rugs and carpets free of stains, dust and mites.' },
       shop: { title: 'Shop', description: 'Detergents, disinfectants and cleaning accessories.' },
     },
     popularServices: {
@@ -779,6 +802,27 @@ const en: typeof es = {
     },
     propertySurcharge: 'Property surcharge',
     scheduleButton: 'Schedule service',
+  },
+  carpets: {
+    title: 'Carpet Cleaning',
+    heroTitle: 'Carpets Like New',
+    heroSubtitle: 'Deep cleaning that removes stains and dust mites',
+    choosePlan: 'How much do you need cleaned?',
+    plans: {
+      small: { name: 'Basic', rooms: '1-2 rugs', features: ['Deep vacuuming', 'Hand brushing', 'Dries in 4 hrs'] },
+      medium: { name: 'Standard', rooms: 'Up to 4 areas', features: ['Everything in Basic', 'Antibacterial shampoo', 'Machine brushing'] },
+      large: { name: 'Premium', rooms: 'Whole house', features: ['Everything in Standard', 'Stain protector', '30-day guarantee'] },
+    },
+    extraServices: 'Extra services',
+    extras: {
+      stainRemoval: 'Stain removal',
+      sanitizing: 'Antibacterial sanitizing',
+      deodorizing: 'Deodorizing',
+      quickDry: 'Quick dry',
+    },
+    extrasLabel: 'Extras',
+    planLabel: 'Plan',
+    scheduleButton: 'Schedule Cleaning',
   },
   cart: {
     title: 'Cart',

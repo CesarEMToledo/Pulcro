@@ -35,6 +35,7 @@ function RootNavigator() {
         <Stack.Screen name="laundry" />
         <Stack.Screen name="garments" />
         <Stack.Screen name="house" />
+        <Stack.Screen name="carpets" />
         <Stack.Screen name="car" />
         <Stack.Screen name="plumbing" />
         <Stack.Screen name="gardening" />
