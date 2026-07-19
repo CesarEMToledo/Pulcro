@@ -9,6 +9,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -27,6 +28,9 @@ import {
   Minus,
   ChevronLeft,
   ChevronRight,
+  Phone,
+  Share2,
+  PartyPopper,
 } from 'lucide-react-native';
 import ScreenHeader from '@/components/ScreenHeader';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -34,6 +38,9 @@ import FallbackImage from '@/components/FallbackImage';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useLocation } from '@/contexts/LocationContext';
+import { categoryFromCartItemId, isDispatchable } from '@/constants/dispatch';
+import { buildOrderMessage, openOrderDispatch } from '@/lib/orderDispatch';
+import { postDemandEvent } from '@/lib/demandCounter';
 
 type Address = { id: string; label: string; text: string };
 
@@ -80,6 +87,9 @@ export default function CartScreen() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
 
   // Date/time state
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -110,6 +120,40 @@ export default function CartScreen() {
     setSelectedAddressId(id);
     setNewAddress('');
     setShowAddressModal(false);
+  };
+
+  const canConfirmOrder = items.length > 0 && contactPhone.trim().length > 0;
+
+  const handleConfirmOrder = async () => {
+    if (!canConfirmOrder) return;
+
+    items.forEach((item) => {
+      const category = categoryFromCartItemId(item.id);
+      if (category) postDemandEvent(category, item.price * item.quantity);
+    });
+
+    const dispatchableItems = items.filter((item) => isDispatchable(categoryFromCartItemId(item.id)));
+    if (dispatchableItems.length > 0) {
+      const message = buildOrderMessage({
+        name: contactName.trim(),
+        phone: contactPhone.trim(),
+        address: currentAddress.text,
+        items: dispatchableItems,
+      });
+      await openOrderDispatch(message);
+    }
+
+    setShowOrderSuccess(true);
+  };
+
+  const shareApp = () => {
+    Share.share({ message: t.cart.shareMessage }).catch(() => {});
+  };
+
+  const finishOrder = () => {
+    setShowOrderSuccess(false);
+    clearAll();
+    router.push('/(tabs)/orders');
   };
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -166,11 +210,20 @@ export default function CartScreen() {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          {items.map((item) => (
+          {items.map((item) => {
+            const dispatchable = isDispatchable(categoryFromCartItemId(item.id));
+            return (
             <View key={item.id} style={styles.cartItem}>
               <FallbackImage source={item.image} style={styles.itemImage} />
               <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
+                <View style={styles.itemNameRow}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  {!dispatchable && (
+                    <View style={styles.comingSoonBadge}>
+                      <Text style={styles.comingSoonBadgeText}>{t.cart.comingSoonBadge}</Text>
+                    </View>
+                  )}
+                </View>
                 <Text style={styles.itemDetail}>{item.detail}</Text>
                 <View style={styles.itemBottomRow}>
                   <Text style={styles.itemPrice}>{MXN(item.price * item.quantity)}</Text>
@@ -207,7 +260,8 @@ export default function CartScreen() {
                 <Trash2 size={16} color={Colors.error} strokeWidth={2.5} />
               </TouchableOpacity>
             </View>
-          ))}
+            );
+          })}
 
           {/* Address */}
           <View style={styles.sectionCard}>
@@ -223,6 +277,33 @@ export default function CartScreen() {
               <TouchableOpacity activeOpacity={0.7} onPress={() => setShowAddressModal(true)} style={styles.changeBtn}>
                 <Text style={styles.changeText}>{t.common.change}</Text>
               </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Contact */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionTitle}>{t.cart.phoneLabel}</Text>
+            <View style={styles.contactRow}>
+              <TextInput
+                value={contactName}
+                onChangeText={setContactName}
+                placeholder={t.cart.namePlaceholder}
+                placeholderTextColor={Colors.textMuted}
+                style={styles.contactInput}
+              />
+            </View>
+            <View style={styles.contactRow}>
+              <View style={styles.addressIcon}>
+                <Phone size={18} color={Colors.primary} strokeWidth={2.5} />
+              </View>
+              <TextInput
+                value={contactPhone}
+                onChangeText={setContactPhone}
+                placeholder={t.cart.phonePlaceholder}
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="phone-pad"
+                style={styles.contactInput}
+              />
             </View>
           </View>
 
@@ -275,13 +356,14 @@ export default function CartScreen() {
             </View>
           </View>
 
+          {!canConfirmOrder && (
+            <Text style={styles.phoneRequiredHint}>{t.cart.phoneRequired}</Text>
+          )}
           <PrimaryButton
             label={t.cart.confirmOrder}
-            onPress={() => {
-              clearAll();
-              router.push('/(tabs)/orders');
-            }}
-            style={{ marginTop: Spacing.lg }}
+            onPress={handleConfirmOrder}
+            disabled={!canConfirmOrder}
+            style={{ marginTop: Spacing.sm }}
           />
           <View style={{ height: Spacing.xxl }} />
         </ScrollView>
@@ -533,6 +615,24 @@ export default function CartScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Order Success Modal */}
+      <Modal visible={showOrderSuccess} animationType="fade" transparent>
+        <View style={styles.confirmOverlay}>
+          <View style={styles.confirmCard}>
+            <View style={[styles.confirmIcon, { backgroundColor: Colors.success + '15' }]}>
+              <PartyPopper size={28} color={Colors.success} strokeWidth={2.5} />
+            </View>
+            <Text style={styles.confirmTitle}>{t.cart.orderReceivedTitle}</Text>
+            <Text style={styles.confirmText}>{t.cart.orderReceivedSubtitle}</Text>
+            <TouchableOpacity activeOpacity={0.7} onPress={shareApp} style={styles.shareBtn}>
+              <Share2 size={16} color={Colors.primary} strokeWidth={2.5} />
+              <Text style={styles.shareBtnText}>{t.cart.shareButton}</Text>
+            </TouchableOpacity>
+            <PrimaryButton label={t.cart.continueButton} onPress={finishOrder} style={{ width: '100%', marginTop: Spacing.md }} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -551,7 +651,10 @@ const styles = StyleSheet.create({
   cartItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, marginBottom: Spacing.sm, ...Shadow.sm },
   itemImage: { width: moderateScale(64), height: moderateScale(64), borderRadius: Radius.md, resizeMode: 'cover' },
   itemInfo: { flex: 1 },
+  itemNameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   itemName: { fontSize: FontSize.md, fontWeight: '600', color: Colors.textPrimary },
+  comingSoonBadge: { paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: Radius.full, backgroundColor: Colors.warning + '18' },
+  comingSoonBadgeText: { fontSize: FontSize.xs - 1, fontWeight: '700', color: Colors.warning },
   itemDetail: { fontSize: FontSize.sm, color: Colors.textMuted, marginTop: 2 },
   itemBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
   itemPrice: { fontSize: FontSize.md, fontWeight: '700', color: Colors.primary },
@@ -577,6 +680,13 @@ const styles = StyleSheet.create({
   paymentRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   paymentIcon: { width: moderateScale(40), height: moderateScale(40), borderRadius: Radius.md, backgroundColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
   paymentText: { flex: 1, fontSize: FontSize.md, fontWeight: '500', color: Colors.textPrimary },
+
+  contactRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
+  contactInput: { flex: 1, fontSize: FontSize.md, color: Colors.textPrimary, paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  phoneRequiredHint: { fontSize: FontSize.xs, color: Colors.error, textAlign: 'center', marginTop: Spacing.sm },
+
+  shareBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, paddingVertical: Spacing.sm, marginTop: Spacing.sm },
+  shareBtnText: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.primary },
 
   summaryCard: { backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.lg, ...Shadow.sm },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.sm },
