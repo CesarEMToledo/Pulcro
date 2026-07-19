@@ -23,7 +23,6 @@ const es = {
   tabs: {
     home: 'Inicio',
     orders: 'Pedidos',
-    shop: 'Tienda',
     profile: 'Perfil',
   },
   home: {
@@ -61,6 +60,7 @@ const es = {
       plumbing: { title: 'Plomería', description: 'Reparación de fugas, instalación de tuberías y más, a domicilio.' },
       gardening: { title: 'Jardinería', description: 'Mantenimiento y diseño de jardines por profesionales.' },
       electricity: { title: 'Electricidad', description: 'Instalaciones y reparaciones eléctricas seguras y rápidas.' },
+      shop: { title: 'Tienda', description: 'Detergentes, desinfectantes y accesorios de limpieza.' },
     },
     popularServices: {
       sneakers: 'Lavado de Tenis',
@@ -435,7 +435,6 @@ const en: typeof es = {
   tabs: {
     home: 'Home',
     orders: 'Orders',
-    shop: 'Shop',
     profile: 'Profile',
   },
   home: {
@@ -473,6 +472,7 @@ const en: typeof es = {
       plumbing: { title: 'Plumbing', description: 'Leak repair, pipe installation and more, at your door.' },
       gardening: { title: 'Gardening', description: 'Garden maintenance and design by professionals.' },
       electricity: { title: 'Electricity', description: 'Safe and fast electrical installations and repairs.' },
+      shop: { title: 'Shop', description: 'Detergents, disinfectants and cleaning accessories.' },
     },
     popularServices: {
       sneakers: 'Sneaker Cleaning',

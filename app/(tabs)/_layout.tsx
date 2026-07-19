@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, FontSize } from '@/constants/theme';
 import { moderateScale } from '@/constants/responsive';
-import { Home, ShoppingBag, ClipboardList, User } from 'lucide-react-native';
+import { Home, ClipboardList, User } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function TabLayout() {
@@ -42,13 +42,6 @@ export default function TabLayout() {
         options={{
           title: t.tabs.orders,
           tabBarIcon: ({ size, color }) => <ClipboardList size={size} color={color} strokeWidth={2.5} />,
-        }}
-      />
-      <Tabs.Screen
-        name="shop"
-        options={{
-          title: t.tabs.shop,
-          tabBarIcon: ({ size, color }) => <ShoppingBag size={size} color={color} strokeWidth={2.5} />,
         }}
       />
       <Tabs.Screen

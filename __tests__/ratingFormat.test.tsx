@@ -3,7 +3,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { LocationProvider } from '@/contexts/LocationContext';
 import { CartProvider } from '@/contexts/CartContext';
 import HomeScreen from '../app/(tabs)/index';
-import ShopScreen from '../app/(tabs)/shop';
+import ShopScreen from '../app/shop';
 
 // Regression: ISSUE-005 — rating format inconsistency. Whole-number ratings
 // (5.0) rendered as "5" while others rendered as "4.9"/"4.8", because the

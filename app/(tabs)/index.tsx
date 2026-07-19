@@ -25,6 +25,7 @@ const categoriesData = [
   { key: 'plumbing' as const, route: '/plumbing' as const },
   { key: 'gardening' as const, route: '/gardening' as const },
   { key: 'electricity' as const, route: '/electricity' as const },
+  { key: 'shop' as const, route: '/shop' as const },
 ];
 
 // Static data for the 4 best-offers hero carousel: reuses the same

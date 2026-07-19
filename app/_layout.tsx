@@ -31,6 +31,7 @@ function RootNavigator() {
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="shop" />
         <Stack.Screen name="laundry" />
         <Stack.Screen name="garments" />
         <Stack.Screen name="house" />

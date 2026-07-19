@@ -46,7 +46,6 @@ export default function ShopScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScreenHeader
         title={t.shop.title}
-        showBack={false}
         rightIcon={<ShoppingBag size={20} color={Colors.primary} strokeWidth={2.5} />}
         onRightPress={() => router.push('/cart')}
         rightAccessibilityLabel={t.cart.title}

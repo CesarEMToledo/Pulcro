@@ -9,3 +9,4 @@ Icons sourced from [microsoft/fluentui-emoji](https://github.com/microsoft/fluen
 | plumbing.png | Wrench |
 | gardening.png | Potted plant |
 | electricity.png | High voltage |
+| shop.png | Department store |

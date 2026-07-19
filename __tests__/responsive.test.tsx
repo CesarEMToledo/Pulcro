@@ -2,7 +2,7 @@ import { moderateScale } from '@/constants/responsive';
 
 // Regression: scaleSpacing/moderateScale had no upper bound, so on wide web
 // viewports (e.g. 1344px) spacing scaled up enough that two 47%-wide cards
-// plus a scaled-up gap no longer fit in one row (app/(tabs)/shop.tsx grid
+// plus a scaled-up gap no longer fit in one row (app/shop.tsx grid
 // collapsed to a single column). moderateScale should stop scaling past the
 // tablet breakpoint instead of growing indefinitely with window width.
 // Found during manual responsive review, 2026-07-18.
