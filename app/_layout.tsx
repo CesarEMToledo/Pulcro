@@ -8,7 +8,10 @@ import { CartProvider } from '@/contexts/CartContext';
 import LocationConfirmScreen from '@/components/LocationConfirmScreen';
 import LoadingScreen from '@/components/LoadingScreen';
 
-const MIN_LOADING_TIME = 1800;
+// Matches LoadingAnimation's full 3.6s cycle (fill → mix → drain/reveal →
+// settle) so the screen never disappears mid-animation, before the logo
+// reveal plays.
+const MIN_LOADING_TIME = 3800;
 
 function RootNavigator() {
   const { isReady, address, confirmLocation } = useLocation();
